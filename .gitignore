@@ -1,0 +1,27 @@
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# local media / generated output
+out/
+demo_run/
+*.mov
+*.MOV
+*.mp4
+*.MP4
+*.m4a
+*.wav
+
+# macOS
+.DS_Store

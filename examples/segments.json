@@ -1,0 +1,9 @@
+{
+  "segments": [
+    {"start": "27:14", "end": "28:08", "hits": 40, "kind": "Long rally"},
+    {"start": "38:49", "end": "39:38", "hits": 36, "kind": "Long rally"},
+    {"start": "34:28", "end": "35:02", "hits": 27, "kind": "Long rally"},
+    {"start": 135, "end": 172, "hits": 24, "kind": "Long rally"},
+    {"start": 890, "end": 926, "hits": 24, "kind": "Long rally"}
+  ]
+}
