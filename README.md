@@ -179,6 +179,9 @@ pytest -q                      # 单元测试 + 用 ffmpeg 合成小视频的集
 ruff check . && ruff format --check .
 ```
 
+在仓库里工作的 AI Agent 请先读 [`AGENTS.md`](AGENTS.md)：里面写了四条不可违反的剪辑不变量、
+模块地图、常见改动的落点和完成定义。
+
 ---
 
 ### English summary
