@@ -2,6 +2,7 @@ import { fulfil, hmacSha256Hex, json, timingSafeEqual } from "../../../worker/li
 
 // Creem signs the raw body with HMAC-SHA256 (hex) in the `creem-signature` header.
 export async function onRequestPost({ request, env }) {
+  if (!env.CREEM_WEBHOOK_SECRET) return json({ error: "webhook not configured" }, 503);
   const raw = await request.text();
   const expected = await hmacSha256Hex(env.CREEM_WEBHOOK_SECRET, raw);
   if (!timingSafeEqual(expected, request.headers.get("creem-signature") || "")) {
