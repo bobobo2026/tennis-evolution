@@ -14,7 +14,7 @@ pip install -e ".[dev]"
 # 三条必须保持绿色的命令（提交前全跑）
 ruff check .
 ruff format --check .
-pytest -q            # 52 项；集成测试会用 ffmpeg 现场合成 8 秒小视频，不需要素材
+pytest -q            # 156 项；集成测试会用 ffmpeg 现场合成 8 秒小视频，不需要素材
 ```
 
 跑真实素材（耗时约 5 分钟，只在改动 ffmpeg 参数/编码/色彩时需要）：
@@ -52,6 +52,11 @@ python3 -c "import json;m=json.load(open('/tmp/demo/manifest.json'));print(m['ok
 | `src/tennis_evolution/webapp/app.py` | 本地网页版 HTTP 层（标准库 `http.server`：路由/静态/Range/上传/JSON 错误） | `tennis-evolution web`、浏览器体验 |
 | `src/tennis_evolution/webapp/jobs.py` | 网页版任务层（单并发队列、阶段进度、日志、run 目录持久化、demo 读取、SDR h264 预览转码） | 网页端进度/结果契约 |
 | `src/tennis_evolution/webapp/static/` | 单页 UI（vanilla HTML/CSS/JS，无构建、无外链） | 视觉交付 |
+| `src/tennis_evolution/license.py` | Pro 许可证：纯 Python Ed25519 校验、存取、`FREE_MAX_RALLIES`、水印文案 | 免费/Pro 边界、所有已发出的许可证 |
+| `src/tennis_evolution/mcp.py` | MCP server（stdio JSON-RPC，标准库）；渲染走子进程 + 后台 job | Agent 接入契约（工具名/参数一旦发布别改） |
+| `functions/api/*` + `worker/lib.js` | Cloudflare Pages Functions：checkout、Creem/爱发电 webhook、取证、stats | 付款与发证；改完必须重新部署 |
+| `site/` | 公开官网（静态）+ `guides/` 指南页 + `thanks/` | SEO 与转化 |
+| `tools/` | `monitor.py` 每日监控、`indexnow.py`、`issue-license.mjs` 手工发证 | 运营 |
 
 网页版的接口与数据形状契约在 [`docs/webapp.md`](docs/webapp.md)：改字段先改契约，再改两端。
 浏览器不能解 HEVC，所以每个要被页面播放的文件都有一份 `preview/` 下的 SDR h264 sibling。
@@ -95,7 +100,7 @@ Agent 与脚本都靠它判断成败。
 - 单元测试**不依赖 ffmpeg**：用 `MediaInfo`/`ClipPlan`/`Segment` 假数据构造（见 `tests/test_cut.py`）。
 - 集成测试用 `lavfi` 现场合成 8 秒视频（`tests/test_integration.py`，`pytest.mark.integration`），
   **不要往仓库里提交任何媒体文件**（`.gitignore` 已覆盖 `*.mov/*.mp4/*.m4a`）。
-- 没有 CJK 字体时 label 相关测试会 skip；CI 装了 `fonts-noto-cjk`，应该全部执行（52 passed，0 skipped）。
+- 没有 CJK 字体时 label 相关测试会 skip；CI 装了 `fonts-noto-cjk`，应该全部执行（156 passed，0 skipped）。
 - CI 矩阵：Python 3.11/3.12/3.13 + `apt install ffmpeg fonts-noto-cjk` + `ruff check` + `pytest`。
 
 ## 5. 代码风格
@@ -122,6 +127,13 @@ Agent 与脚本都靠它判断成败。
 - [ ] 改了 ffmpeg 行为 → 真实素材跑过 `all`，`manifest.ok == true`
 - [ ] 新输出文件写进 `manifest.json`
 - [ ] commit message 说明**为什么**，不只说明改了什么
+
+## 7.1 付费与 Agent 相关的额外约束
+
+- `license.PUBLIC_KEY_HEX` 与签发私钥成对，**改了就让所有已售许可证失效**；测试用 `tests/test_license.py` 里的测试密钥对。
+- 免费版限制只在 `cli.free_tier_top` 与 `LabelStyle.watermark` 两处，别在别处散落判断。
+- MCP 工具的 stdout 只能写 JSON-RPC；任何渲染输出必须走子进程（见 `mcp._cli`）。
+- Webhook 必须幂等（`worker/lib.js::fulfil`）：同一订单重复推送返回同一把许可证。
 
 ## 8. 故障速查
 
