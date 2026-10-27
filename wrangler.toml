@@ -6,6 +6,11 @@ compatibility_date = "2026-09-01"
 binding = "LICENSES"
 id = "208d6dacdc0d48acac8adc345b639135"
 
+[[d1_databases]]
+binding = "ANALYTICS"
+database_name = "te-analytics"
+database_id = "27d9fc37-a047-429c-8061-f76fbf809a2a"
+
 [vars]
 SITE_URL = "https://tennis-evolution.pages.dev"
 CREEM_API_BASE = "https://api.creem.io"

@@ -95,4 +95,7 @@
 
 `tools/monitor.py`：站点健康、GitHub、PyPI 下载、MCP Registry 收录、DDG/Bing 排名、销量（`TE_STATS_TOKEN` 或 `~/.config/tennis-evolution-issuer/stats_token`），
 与上次快照对比输出差值，历史在 `~/.local/share/tennis-evolution/monitor.jsonl`。
+AI 侧（借鉴 GEOInflow 的思路，轻量自建）：`functions/_middleware.js` 记录 AI 爬虫抓取和从 AI 回答点进来的访客，
+监控脚本再拿 sitemap 算「哪些页面 AI 从没抓过」。只存按天计数，不加前端脚本，不存 IP/cookie。
+
 本机定时任务「网球进化 · 每日曝光与销售监控」每天 9:00 跑一次，并用 Agent 搜索补测 Google/Agent 侧排名，输出日报。

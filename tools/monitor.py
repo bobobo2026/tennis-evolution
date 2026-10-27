@@ -162,16 +162,62 @@ def search() -> dict[str, dict[str, int | None]]:
 
 
 def sales() -> dict[str, object]:
-    token = os.environ.get("TE_STATS_TOKEN")
-    token_file = Path.home() / ".config" / "tennis-evolution-issuer" / "stats_token"
-    if not token and token_file.exists():
-        token = token_file.read_text(encoding="utf-8").strip()
+    token = _stats_token()
     if not token:
         return {"configured": False}
     status, body, _ = fetch(SITE + "/api/stats", headers={"Authorization": f"Bearer {token}"})
     if status != 200:
         return {"error": status}
     return json.loads(body)
+
+
+def _stats_token() -> str | None:
+    token = os.environ.get("TE_STATS_TOKEN")
+    token_file = Path.home() / ".config" / "tennis-evolution-issuer" / "stats_token"
+    if not token and token_file.exists():
+        token = token_file.read_text(encoding="utf-8").strip()
+    return token or None
+
+
+def sitemap_paths() -> list[str]:
+    status, body, _ = fetch(SITE + "/sitemap.xml")
+    if status != 200:
+        return []
+    return [urllib.parse.urlparse(loc).path for loc in re.findall(r"<loc>([^<]+)</loc>", body)]
+
+
+def ai_visibility() -> dict[str, object]:
+    """AI crawlers, AI-answer referrals and crawl coverage of the sitemap (last 30 days)."""
+    token = _stats_token()
+    if not token:
+        return {"configured": False}
+    status, body, _ = fetch(
+        SITE + "/api/stats?view=ai&days=30", headers={"Authorization": f"Bearer {token}"}
+    )
+    if status != 200:
+        return {"error": status}
+    data = json.loads(body)
+
+    def per_agent(kind: str, field: str) -> dict[str, int]:
+        return {name: entry[field] for name, entry in sorted(data.get(kind, {}).items())}
+
+    pages = sitemap_paths()
+    crawled = set(data.get("crawled_paths", {}))
+    never = [path for path in pages if path not in crawled]
+    return {
+        "crawlers_yesterday": per_agent("crawler", "yesterday"),
+        "crawlers_30d": per_agent("crawler", "hits"),
+        "ai_referrals_yesterday": per_agent("ai_ref", "yesterday"),
+        "ai_referrals_30d": per_agent("ai_ref", "hits"),
+        "search_bots_30d": per_agent("search_bot", "hits"),
+        "search_referrals_30d": per_agent("search_ref", "hits"),
+        "coverage": {
+            "sitemap_pages": len(pages),
+            "crawled_by_ai": len(pages) - len(never),
+            "never_crawled": never,
+        },
+        "crawl_errors": len(data.get("errors", [])),
+    }
 
 
 def history_path() -> Path:
@@ -188,7 +234,9 @@ def previous(path: Path) -> dict | None:
 
 def flatten(data: object, prefix: str = "") -> dict[str, object]:
     flat: dict[str, object] = {}
-    if isinstance(data, dict):
+    if isinstance(data, dict) and not data and prefix:
+        flat[prefix[:-1]] = "none"
+    elif isinstance(data, dict):
         for key, value in data.items():
             flat.update(flatten(value, f"{prefix}{key}."))
     else:
@@ -252,6 +300,7 @@ def main() -> int:
         "pypi": pypi(),
         "mcp_registry": mcp_registry(),
         "sales": sales(),
+        "ai": ai_visibility(),
     }
     if not args.no_search:
         snapshot["search"] = search()

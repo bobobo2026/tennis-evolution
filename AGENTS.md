@@ -55,6 +55,7 @@ python3 -c "import json;m=json.load(open('/tmp/demo/manifest.json'));print(m['ok
 | `src/tennis_evolution/license.py` | Pro 许可证：纯 Python Ed25519 校验、存取、`FREE_MAX_RALLIES`、水印文案 | 免费/Pro 边界、所有已发出的许可证 |
 | `src/tennis_evolution/mcp.py` | MCP server（stdio JSON-RPC，标准库）；渲染走子进程 + 后台 job | Agent 接入契约（工具名/参数一旦发布别改） |
 | `functions/api/*` + `worker/lib.js` | Cloudflare Pages Functions：checkout、Creem/爱发电 webhook、取证、stats | 付款与发证；改完必须重新部署 |
+| `functions/_middleware.js` + `worker/visibility.js` + `worker/schema.sql` | AI 爬虫 / AI 回答来访计数（D1，只存按天聚合，不存 IP/cookie/原始 UA）；爬虫与来源目录在 `visibility.js` 顶部 | 每日日报的 AI 侧数据；改目录别改已发布的名字，否则历史断档 |
 | `site/` | 公开官网（静态）+ `guides/` 指南页 + `thanks/` | SEO 与转化 |
 | `tools/` | `monitor.py` 每日监控、`indexnow.py`、`issue-license.mjs` 手工发证 | 运营 |
 
