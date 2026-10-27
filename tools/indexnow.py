@@ -15,7 +15,10 @@ KEY = "7fbd3247a2582a5a4434766de4e98eab"
 
 
 def main() -> int:
-    with urllib.request.urlopen(f"{SITE}/sitemap.xml", timeout=20) as response:
+    sitemap = urllib.request.Request(
+        f"{SITE}/sitemap.xml", headers={"User-Agent": "tennis-evolution-indexnow/1.0"}
+    )
+    with urllib.request.urlopen(sitemap, timeout=20) as response:
         urls = re.findall(r"<loc>([^<]+)</loc>", response.read().decode())
     payload = {
         "host": SITE.split("//", 1)[1],
