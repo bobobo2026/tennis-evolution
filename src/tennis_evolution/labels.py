@@ -122,6 +122,8 @@ class LabelStyle:
     text_dim: tuple[int, int, int] = (232, 232, 232)
     text_faint: tuple[int, int, int] = (190, 190, 190)
     extra_lines: list[str] = field(default_factory=list)
+    watermark: str | None = None
+    watermark_px: int = 22
 
 
 @dataclass
@@ -267,6 +269,27 @@ def render_label(
             spec.unit,
             font=unit_font,
             fill=(*style.text_dim, 255),
+        )
+
+    if style.watermark:
+        mark_font = _font(fonts.regular(), px(style.watermark_px))
+        mark_w, mark_h = _text_size(mark_font, style.watermark)
+        mark_pad = px(12)
+        right = width - margin
+        bottom = height - top
+        draw.rounded_rectangle(
+            [right - mark_w - mark_pad * 2, bottom - mark_h - mark_pad * 2, right, bottom],
+            radius=px(12),
+            fill=(0, 0, 0, 90),
+        )
+        draw.text(
+            (
+                right - mark_w - mark_pad,
+                bottom - mark_h - mark_pad - mark_font.getbbox(style.watermark)[1],
+            ),
+            style.watermark,
+            font=mark_font,
+            fill=(255, 255, 255, 200),
         )
 
     return canvas

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why ffmpeg concat -c copy Desyncs Highlight Reels (and the One-Pass Fix)</title>
+  <meta name="description" content="Joining stream-copied clips with the concat demuxer produced a permanent 1.01 s audio offset, Non-monotonic DTS and broken HEVC references. Here is why, and the trim+concat one-pass fix.">
+  <link rel="canonical" href="https://tennis-evolution.pages.dev/guides/ffmpeg-concat-audio-desync/">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#0A0F0C">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Why naive ffmpeg concat desyncs a highlight reel">
+  <meta property="og:description" content="Joining stream-copied clips with the concat demuxer produced a permanent 1.01 s audio offset, Non-monotonic DTS and broken HEVC references. Here is why, and the trim+concat one-pass fix.">
+  <meta property="og:url" content="https://tennis-evolution.pages.dev/guides/ffmpeg-concat-audio-desync/">
+  <meta property="og:image" content="https://tennis-evolution.pages.dev/assets/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "Why naive ffmpeg concat desyncs a highlight reel",
+      "description": "Joining stream-copied clips with the concat demuxer produced a permanent 1.01 s audio offset, Non-monotonic DTS and broken HEVC references. Here is why, and the trim+concat one-pass fix.",
+      "inLanguage": "en",
+      "datePublished": "2026-10-27",
+      "dateModified": "2026-10-27",
+      "mainEntityOfPage": "https://tennis-evolution.pages.dev/guides/ffmpeg-concat-audio-desync/",
+      "author": {
+        "@type": "Organization",
+        "name": "Tennis Evolution",
+        "url": "https://tennis-evolution.pages.dev/"
+      },
+      "about": {
+        "@id": "https://tennis-evolution.pages.dev/#software"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can I still do a lossless join?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, `tennis-evolution concat` exists as an escape hatch, but it reports the timestamp problems instead of hiding them."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Tennis Evolution",
+          "item": "https://tennis-evolution.pages.dev/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Guides",
+          "item": "https://tennis-evolution.pages.dev/guides/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Why naive ffmpeg concat desyncs a highlight reel",
+          "item": "https://tennis-evolution.pages.dev/guides/ffmpeg-concat-audio-desync/"
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap head-inner">
+      <a class="brand" href="/"><span class="brand-ball" aria-hidden="true"></span><span>Tennis Evolution</span></a>
+      <nav class="nav" aria-label="Primary">
+        <a href="/#lab">Try it</a>
+        <a href="/#agents">Agents</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/guides/">Guides</a>
+      </nav>
+      <div class="head-actions">
+        <a class="head-btn" href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="guide">
+    <article class="wrap guide-body">
+      <p class="eyebrow"><a href="/guides/">Guides</a></p>
+      <h1>Why naive ffmpeg concat desyncs a highlight reel</h1>
+      <p class="lede">The obvious way to build a highlight reel — cut clips with -c copy, then join them with the concat demuxer — failed in three different ways on a real iPhone recording. This is what went wrong and what the tool does instead.</p>
+        <h2>The symptoms</h2>
+        <ul><li>The finished reel's video started <b>1.01 s</b> after its audio and never caught up.</li><li>ffmpeg printed <code>Non-monotonic DTS</code> at every join.</li><li>HEVC decoding failed after joins with <code>Could not find ref with POC</code>, showing corrupt frames.</li></ul>
+        <h2>Why it happens</h2>
+        <p>Stream-copied cuts must start on a keyframe, but the audio packet nearest that keyframe starts a few milliseconds earlier or later. Each clip therefore has slightly different audio and video start times. The concat demuxer stitches timestamps, not samples, so those offsets accumulate, and the first clip's offset (here, a 1.01 s keyframe gap) becomes permanent. HEVC open-GOP streams also reference frames from before the cut, which do not exist in the joined file.</p>
+        <h2>The fix: trim → concat → one encode</h2>
+        <pre><code>ffmpeg -i source.MOV -filter_complex \
+ "[0:v]trim=start=A:end=B,setpts=PTS-STARTPTS[v0];[0:a]atrim=start=A:end=B,asetpts=PTS-STARTPTS[a0];... \
+  [v0][a0][v1][a1]concat=n=2:v=1:a=1[v][a]" -map "[v]" -map "[a]" \
+ -c:v libx265 -crf 19 -color_primaries bt2020 -color_trc arib-std-b67 -colorspace bt2020nc reel.mp4</code></pre><p>Every segment is trimmed from the original source with sample-accurate timestamps reset to zero, concatenated in the filter graph, and encoded once. No join ever sees a keyframe boundary, so there is nothing to drift.</p>
+        <h2>Then verify, every time</h2>
+        <p>Tennis Evolution checks each output: clean full decode, video and audio both starting at 0 s, matching durations, non-black first and last frames, non-silent audio. A failing check exits non-zero, so a script or an agent cannot mistake a broken reel for a finished one.</p>
+      <h2>FAQ</h2>
+      <div class="faq">
+          <details class="faq-item"><summary><span class="faq-q">Can I still do a lossless join?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>Yes, `tennis-evolution concat` exists as an escape hatch, but it reports the timestamp problems instead of hiding them.</p></div></details>
+      </div>
+      <p class="cta-row"><a class="btn btn-primary" href="/#lab">Try the rally lab</a> <a class="btn btn-ghost" href="/#pricing">Free vs Pro</a></p>
+    </article>
+  </main>
+  <footer class="foot"><div class="wrap foot-bottom"><span>© 2026 Tennis Evolution</span><span class="mono">runs locally · no upload</span></div></footer>
+</body>
+</html>

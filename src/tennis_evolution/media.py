@@ -6,6 +6,8 @@ import json
 import os
 import shutil
 import subprocess
+import threading
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
@@ -17,6 +19,7 @@ __all__ = [
     "ffmpeg_bin",
     "ffprobe_bin",
     "run",
+    "run_stream",
     "probe",
     "keyframes",
     "first_audio_stream",
@@ -70,6 +73,51 @@ def run(cmd: list[str], *, capture: bool = True) -> subprocess.CompletedProcess[
     if result.returncode != 0:
         raise FfmpegError(cmd, result.returncode, result.stderr or "")
     return result
+
+
+def run_stream(
+    cmd: list[str],
+    *,
+    on_line: Callable[[str], None] | None = None,
+    cancelled: Callable[[], bool] | None = None,
+) -> str:
+    """Run a command while streaming stdout lines to ``on_line``.
+
+    Used by the web UI to turn ``ffmpeg -progress pipe:1`` output into a real
+    progress bar. stderr is drained on a helper thread so the child never blocks on
+    a full pipe; the collected stderr text is returned. ``cancelled`` is polled
+    between lines and kills the child when it returns true.
+    """
+    proc = subprocess.Popen(  # noqa: S603 - command list is built from trusted argv
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        bufsize=1,
+    )
+    stderr_chunks: list[str] = []
+
+    def _drain() -> None:
+        assert proc.stderr is not None
+        for line in proc.stderr:
+            stderr_chunks.append(line)
+
+    reader = threading.Thread(target=_drain, name="ffmpeg-stderr", daemon=True)
+    reader.start()
+    assert proc.stdout is not None
+    try:
+        for line in proc.stdout:
+            if cancelled is not None and cancelled():
+                proc.kill()
+                break
+            if on_line is not None:
+                on_line(line.rstrip("\n"))
+    finally:
+        returncode = proc.wait()
+        reader.join(timeout=5)
+    if returncode != 0:
+        raise FfmpegError(cmd, returncode, "".join(stderr_chunks))
+    return "".join(stderr_chunks)
 
 
 @dataclass(frozen=True)

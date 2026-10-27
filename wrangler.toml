@@ -1,0 +1,19 @@
+name = "tennis-evolution"
+pages_build_output_dir = "site"
+compatibility_date = "2026-09-01"
+
+[[kv_namespaces]]
+binding = "LICENSES"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[vars]
+SITE_URL = "https://tennis-evolution.pages.dev"
+CREEM_API_BASE = "https://api.creem.io"
+CREEM_PRODUCT_ID = "REPLACE_WITH_CREEM_PRODUCT_ID"
+AFDIAN_USER_ID = "REPLACE_WITH_AFDIAN_USER_ID"
+AFDIAN_ORDER_URL = "REPLACE_WITH_AFDIAN_PLAN_PURCHASE_LINK"
+AFDIAN_PLAN_ID = "REPLACE_WITH_AFDIAN_PLAN_ID"
+AFDIAN_MIN_AMOUNT = "138.00"
+
+# secrets (wrangler pages secret put NAME): TE_SIGNING_JWK, CREEM_API_KEY,
+# CREEM_WEBHOOK_SECRET, AFDIAN_TOKEN, STATS_TOKEN

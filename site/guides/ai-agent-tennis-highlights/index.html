@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Make Tennis Highlight Videos with Claude, Cursor or ChatGPT (MCP Server)</title>
+  <meta name="description" content="Connect the Tennis Evolution MCP server to Claude Code, Claude Desktop, Cursor or Codex and ask it to cut the longest rallies from a tennis video. One-line setup, renders locally.">
+  <link rel="canonical" href="https://tennis-evolution.pages.dev/guides/ai-agent-tennis-highlights/">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#0A0F0C">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Let your AI agent cut your tennis highlights">
+  <meta property="og:description" content="Connect the Tennis Evolution MCP server to Claude Code, Claude Desktop, Cursor or Codex and ask it to cut the longest rallies from a tennis video. One-line setup, renders locally.">
+  <meta property="og:url" content="https://tennis-evolution.pages.dev/guides/ai-agent-tennis-highlights/">
+  <meta property="og:image" content="https://tennis-evolution.pages.dev/assets/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "Let your AI agent cut your tennis highlights",
+      "description": "Connect the Tennis Evolution MCP server to Claude Code, Claude Desktop, Cursor or Codex and ask it to cut the longest rallies from a tennis video. One-line setup, renders locally.",
+      "inLanguage": "en",
+      "datePublished": "2026-10-27",
+      "dateModified": "2026-10-27",
+      "mainEntityOfPage": "https://tennis-evolution.pages.dev/guides/ai-agent-tennis-highlights/",
+      "author": {
+        "@type": "Organization",
+        "name": "Tennis Evolution",
+        "url": "https://tennis-evolution.pages.dev/"
+      },
+      "about": {
+        "@id": "https://tennis-evolution.pages.dev/#software"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Does ChatGPT support it?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Any client that can run local MCP servers can use it. ChatGPT desktop connectors that only accept remote servers cannot run it yet."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does the agent detect hits by itself?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Give it a rally list (sliceapp export, notes, or another detector); the agent and the tool handle cutting, labeling and checking."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Tennis Evolution",
+          "item": "https://tennis-evolution.pages.dev/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Guides",
+          "item": "https://tennis-evolution.pages.dev/guides/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Let your AI agent cut your tennis highlights",
+          "item": "https://tennis-evolution.pages.dev/guides/ai-agent-tennis-highlights/"
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap head-inner">
+      <a class="brand" href="/"><span class="brand-ball" aria-hidden="true"></span><span>Tennis Evolution</span></a>
+      <nav class="nav" aria-label="Primary">
+        <a href="/#lab">Try it</a>
+        <a href="/#agents">Agents</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/guides/">Guides</a>
+      </nav>
+      <div class="head-actions">
+        <a class="head-btn" href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="guide">
+    <article class="wrap guide-body">
+      <p class="eyebrow"><a href="/guides/">Guides</a></p>
+      <h1>Let your AI agent cut your tennis highlights</h1>
+      <p class="lede">Tennis Evolution exposes its whole pipeline as an MCP server, so an AI agent can inspect your recording, pick the rallies, render a labeled reel and check the result — while the video stays on your machine.</p>
+        <h2>Claude Code</h2>
+        <pre><code>claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp</code></pre><p>Or install the plugin, which adds the skill as well: <code>/plugin marketplace add bobobo2026/tennis-evolution</code> then <code>/plugin install tennis-evolution@tennis-evolution</code>.</p>
+        <h2>Claude Desktop, Cursor, Windsurf, Codex</h2>
+        <pre><code>{
+  "mcpServers": {
+    "tennis-evolution": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/bobobo2026/tennis-evolution", "tennis-evolution", "mcp"]
+    }
+  }
+}</code></pre><p>Requires <a href="https://docs.astral.sh/uv/">uv</a> and ffmpeg on the machine that runs the agent.</p>
+        <h2>What to say</h2>
+        <ul><li>“Cut the five longest rallies out of ~/Movies/match.MOV and label them Riverside Tennis Club.”</li><li>“Here is my sliceapp export — make a reel in the order they were played.”</li><li>“Check whether out/reel_labeled.mp4 has any audio sync problems.”</li></ul>
+        <h2>The tools the agent gets</h2>
+        <ul><li><code>probe_video</code> — duration, HDR, rotation, audio tracks, recording time</li><li><code>rank_highlights</code> — parse a rally list and show which ones will be kept</li><li><code>start_highlight_reel</code> / <code>get_job</code> — render in the background and poll; returns the manifest</li><li><code>verify_video</code> — decode, A/V offset, black frames, silence</li><li><code>license_status</code> / <code>activate_license</code> — free vs Pro</li></ul>
+        <h2>Why MCP instead of a cloud API</h2>
+        <p>An hour of match footage is several gigabytes and full of people who did not agree to be uploaded. With MCP the agent drives a local process: nothing leaves the disk, there is no queue, and the free version works without an account.</p>
+      <h2>FAQ</h2>
+      <div class="faq">
+          <details class="faq-item"><summary><span class="faq-q">Does ChatGPT support it?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>Any client that can run local MCP servers can use it. ChatGPT desktop connectors that only accept remote servers cannot run it yet.</p></div></details>
+          <details class="faq-item"><summary><span class="faq-q">Does the agent detect hits by itself?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>No. Give it a rally list (sliceapp export, notes, or another detector); the agent and the tool handle cutting, labeling and checking.</p></div></details>
+      </div>
+      <p class="cta-row"><a class="btn btn-primary" href="/#lab">Try the rally lab</a> <a class="btn btn-ghost" href="/#pricing">Free vs Pro</a></p>
+    </article>
+  </main>
+  <footer class="foot"><div class="wrap foot-bottom"><span>© 2026 Tennis Evolution</span><span class="mono">runs locally · no upload</span></div></footer>
+</body>
+</html>

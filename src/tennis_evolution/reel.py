@@ -22,13 +22,14 @@ it finds instead of hiding them.
 from __future__ import annotations
 
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 from .cut import ClipPlan
-from .media import MediaInfo, StreamInfo, ffmpeg_bin, first_audio_stream, probe, run
+from .media import MediaInfo, StreamInfo, ffmpeg_bin, first_audio_stream, probe, run, run_stream
 from .util import note, warn
 
-__all__ = ["render_reel", "concat_lossless", "ReelReport"]
+__all__ = ["render_reel", "concat_lossless", "ReelReport", "progress_sink"]
 
 _COLOR_OK = {"bt709", "bt2020", "smpte2084", "arib-std-b67", "smpte170m", "reserved", "unknown"}
 
@@ -118,6 +119,29 @@ def _build_filter(
     return chain, "[v]", "[a]"
 
 
+def progress_sink(total_seconds: float, callback: Callable[[float], None]) -> Callable[[str], None]:
+    """Turn ``ffmpeg -progress pipe:1`` key=value lines into a 0..1 callback.
+
+    ffmpeg reports both ``out_time_us`` and ``out_time_ms``; the latter is in
+    microseconds too (long standing ffmpeg quirk), so both are divided by 1e6.
+    """
+    total = total_seconds if total_seconds > 0 else 1.0
+
+    def sink(line: str) -> None:
+        if line.startswith("progress="):
+            if line.endswith("end"):
+                callback(1.0)
+            return
+        if not line.startswith(("out_time_us=", "out_time_ms=")):
+            return
+        raw = line.partition("=")[2].strip()
+        if not raw.isdigit():
+            return
+        callback(min(1.0, (int(raw) / 1_000_000) / total))
+
+    return sink
+
+
 def render_reel(
     info: MediaInfo,
     plans: list[ClipPlan],
@@ -130,11 +154,16 @@ def render_reel(
     audio: StreamInfo | None = None,
     keep_rotation: bool = False,
     dry_run: bool = False,
+    progress: Callable[[float], None] | None = None,
+    cancelled: Callable[[], bool] | None = None,
 ) -> Path:
     """Render the reel from the source video in one pass.
 
     ``overlays`` is an optional list (same length as ``plans``) of transparent PNGs
     to burn onto each segment, which keeps labels scoped to their own rally.
+    ``progress`` receives a 0..1 fraction driven by ``ffmpeg -progress`` (used by the
+    web UI) and ``cancelled`` is polled between progress lines so a long encode can
+    be aborted. When both are omitted the command is exactly the CLI's.
     """
     if not plans:
         raise SystemExit("nothing to render: empty plan list")
@@ -150,6 +179,8 @@ def render_reel(
         raise ValueError("overlays must have the same length as plans")
 
     cmd: list[str] = [ffmpeg_bin(), "-y", "-v", "warning"]
+    if progress is not None:
+        cmd += ["-progress", "pipe:1", "-nostats"]
     for plan in plans:
         cmd += ["-ss", f"{plan.start:.6f}", "-t", f"{plan.duration:.6f}", "-i", str(info.path)]
     for overlay in overlay_list:
@@ -173,7 +204,11 @@ def render_reel(
     if dry_run:
         note("dry run: " + " ".join(cmd[:12]) + " ...")
         return target
-    run(cmd)
+    if progress is None:
+        run(cmd)
+    else:
+        total = sum(plan.duration for plan in plans) or 1.0
+        run_stream(cmd, on_line=progress_sink(total, progress), cancelled=cancelled)
     return target
 
 

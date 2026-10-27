@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>用 Claude / Cursor 等 AI Agent 剪网球集锦：网球进化 MCP 接入教程</title>
+  <meta name="description" content="一行命令把网球进化 MCP server 接入 Claude Code、Claude Desktop、Cursor、Codex，用一句话让 AI 剪出最长回合集锦，素材不出本机。">
+  <link rel="canonical" href="https://tennis-evolution.pages.dev/zh/guides/ai-agent-jian-wangqiu/">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#0A0F0C">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="让 AI Agent 帮你剪网球集锦">
+  <meta property="og:description" content="一行命令把网球进化 MCP server 接入 Claude Code、Claude Desktop、Cursor、Codex，用一句话让 AI 剪出最长回合集锦，素材不出本机。">
+  <meta property="og:url" content="https://tennis-evolution.pages.dev/zh/guides/ai-agent-jian-wangqiu/">
+  <meta property="og:image" content="https://tennis-evolution.pages.dev/assets/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "让 AI Agent 帮你剪网球集锦",
+      "description": "一行命令把网球进化 MCP server 接入 Claude Code、Claude Desktop、Cursor、Codex，用一句话让 AI 剪出最长回合集锦，素材不出本机。",
+      "inLanguage": "zh-CN",
+      "datePublished": "2026-10-27",
+      "dateModified": "2026-10-27",
+      "mainEntityOfPage": "https://tennis-evolution.pages.dev/zh/guides/ai-agent-jian-wangqiu/",
+      "author": {
+        "@type": "Organization",
+        "name": "Tennis Evolution",
+        "url": "https://tennis-evolution.pages.dev/"
+      },
+      "about": {
+        "@id": "https://tennis-evolution.pages.dev/#software"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Agent 自己会数拍吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不会。回合列表由你提供（sliceapp 导出、手记或其他检测器），Agent 和工具负责剪辑、角标和自检。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "免费版能在 Agent 里用吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "能。免费版每条合集最多 5 段、带小水印；需要更多时购买 Pro 并让 Agent 调用 activate_license。"
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Tennis Evolution",
+          "item": "https://tennis-evolution.pages.dev/zh/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "指南",
+          "item": "https://tennis-evolution.pages.dev/zh/guides/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "让 AI Agent 帮你剪网球集锦",
+          "item": "https://tennis-evolution.pages.dev/zh/guides/ai-agent-jian-wangqiu/"
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap head-inner">
+      <a class="brand" href="/zh/"><span class="brand-ball" aria-hidden="true"></span><span>网球进化</span></a>
+      <nav class="nav" aria-label="主导航">
+        <a href="/zh/#lab">试一试</a>
+        <a href="/zh/#agents">Agent</a>
+        <a href="/zh/#pricing">价格</a>
+        <a href="/zh/guides/">指南</a>
+      </nav>
+      <div class="head-actions">
+        <a class="head-btn" href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="guide">
+    <article class="wrap guide-body">
+      <p class="eyebrow"><a href="/zh/guides/">指南</a></p>
+      <h1>让 AI Agent 帮你剪网球集锦</h1>
+      <p class="lede">网球进化把整条流水线做成了 MCP server：AI Agent 可以读素材、挑回合、渲染带角标的合集、检查结果，而视频始终留在你的电脑上。</p>
+        <h2>Claude Code</h2>
+        <pre><code>claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp</code></pre><p>或者装插件（含 Skill）：<code>/plugin marketplace add bobobo2026/tennis-evolution</code>，再 <code>/plugin install tennis-evolution@tennis-evolution</code>。</p>
+        <h2>Claude Desktop / Cursor / Windsurf / Codex</h2>
+        <pre><code>{
+  "mcpServers": {
+    "tennis-evolution": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/bobobo2026/tennis-evolution", "tennis-evolution", "mcp"]
+    }
+  }
+}</code></pre><p>运行 Agent 的电脑上需要装好 uv 和 ffmpeg。</p>
+        <h2>怎么跟它说</h2>
+        <ul><li>「把 ~/Movies/match.MOV 里最长的五个回合剪出来，角标写宁波 ECHO Tennis。」</li><li>「这是 sliceapp 导出的列表，按打球顺序做一条合集。」</li><li>「检查 out/reel_labeled.mp4 有没有音画不同步。」</li></ul>
+        <h2>Agent 能用的工具</h2>
+        <ul><li><code>probe_video</code>：时长、HDR、旋转、音轨、录制时间</li><li><code>rank_highlights</code>：解析回合列表、预览会保留哪些</li><li><code>start_highlight_reel</code> / <code>get_job</code>：后台渲染并轮询，完成后返回 manifest</li><li><code>verify_video</code>：解码、音画偏移、黑帧、静音检查</li><li><code>license_status</code> / <code>activate_license</code>：免费版 / Pro</li></ul>
+      <h2>常见问题</h2>
+      <div class="faq">
+          <details class="faq-item"><summary><span class="faq-q">Agent 自己会数拍吗？</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>不会。回合列表由你提供（sliceapp 导出、手记或其他检测器），Agent 和工具负责剪辑、角标和自检。</p></div></details>
+          <details class="faq-item"><summary><span class="faq-q">免费版能在 Agent 里用吗？</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>能。免费版每条合集最多 5 段、带小水印；需要更多时购买 Pro 并让 Agent 调用 activate_license。</p></div></details>
+      </div>
+      <p class="cta-row"><a class="btn btn-primary" href="/zh/#lab">在线试玩回合实验室</a> <a class="btn btn-ghost" href="/zh/#pricing">免费版 / Pro</a></p>
+    </article>
+  </main>
+  <footer class="foot"><div class="wrap foot-bottom"><span>© 2026 Tennis Evolution</span><span class="mono">本地运行 · 素材不上传</span></div></footer>
+</body>
+</html>

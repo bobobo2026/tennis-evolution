@@ -14,6 +14,7 @@ venv/
 htmlcov/
 
 # local media / generated output
+webapp-runs/
 out/
 demo_run/
 *.mov
@@ -25,3 +26,12 @@ demo_run/
 
 # macOS
 .DS_Store
+
+# public site demo media (CC0 footage re-rendered by this tool: safe to publish)
+!site/assets/*.mp4
+!site/assets/*.jpg
+
+# local secrets for wrangler pages dev
+.dev.vars
+.wrangler/
+node_modules/

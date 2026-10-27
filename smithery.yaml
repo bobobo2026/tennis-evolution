@@ -1,0 +1,15 @@
+# Smithery: local stdio server (ffmpeg must be installed on the host).
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      licenseKey:
+        type: string
+        description: Optional Pro licence key (te1....). Leave empty for the free version.
+  commandFunction: |-
+    (config) => ({
+      command: "uvx",
+      args: ["tennis-evolution", "mcp"],
+      env: config.licenseKey ? { TENNIS_EVOLUTION_LICENSE: config.licenseKey } : {}
+    })

@@ -1,0 +1,19 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.bobobo2026/tennis-evolution",
+  "title": "Tennis Evolution",
+  "description": "Turn a long tennis recording into a labeled highlight reel: lossless rally clips, hit-count labels, self-checks.",
+  "websiteUrl": "https://tennis-evolution.pages.dev/",
+  "repository": { "url": "https://github.com/bobobo2026/tennis-evolution", "source": "github" },
+  "version": "0.2.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "tennis-evolution",
+      "version": "0.2.0",
+      "runtimeHint": "uvx",
+      "transport": { "type": "stdio" },
+      "packageArguments": [{ "type": "positional", "value": "mcp" }]
+    }
+  ]
+}

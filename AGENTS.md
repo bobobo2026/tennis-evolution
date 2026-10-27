@@ -49,6 +49,13 @@ python3 -c "import json;m=json.load(open('/tmp/demo/manifest.json'));print(m['ok
 | `verify.py` | `CheckResult` 电池（解码/起始偏移/时长/亮度/音量） | `all` 退出码、manifest |
 | `cli.py` | 子命令、参数、manifest 组装 | 所有面向用户的契约 |
 | `util.py` | 时间码解析/格式化 | 文件名、角标文本 |
+| `src/tennis_evolution/webapp/app.py` | 本地网页版 HTTP 层（标准库 `http.server`：路由/静态/Range/上传/JSON 错误） | `tennis-evolution web`、浏览器体验 |
+| `src/tennis_evolution/webapp/jobs.py` | 网页版任务层（单并发队列、阶段进度、日志、run 目录持久化、demo 读取、SDR h264 预览转码） | 网页端进度/结果契约 |
+| `src/tennis_evolution/webapp/static/` | 单页 UI（vanilla HTML/CSS/JS，无构建、无外链） | 视觉交付 |
+
+网页版的接口与数据形状契约在 [`docs/webapp.md`](docs/webapp.md)：改字段先改契约，再改两端。
+浏览器不能解 HEVC，所以每个要被页面播放的文件都有一份 `preview/` 下的 SDR h264 sibling。
+`webapp-runs/`（运行产物）与 `demo_run/` 不提交。
 
 `manifest.json` 是**对外契约**：字段名（`ok`/`clips`/`reels`/`verification`/`settings`）一旦发布就别随便改，
 Agent 与脚本都靠它判断成败。

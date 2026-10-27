@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to Make a Tennis Highlight Video from an iPhone Recording (Keep HDR, Add Hit Counts)</title>
+  <meta name="description" content="Step-by-step: turn a 1-hour iPhone tennis recording into a highlight reel of the longest rallies, with hit count, venue and time labels, without losing HDR. Free, local, no upload.">
+  <link rel="canonical" href="https://tennis-evolution.pages.dev/guides/iphone-tennis-highlight-video/">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#0A0F0C">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Make a tennis highlight video from a long iPhone recording">
+  <meta property="og:description" content="Step-by-step: turn a 1-hour iPhone tennis recording into a highlight reel of the longest rallies, with hit count, venue and time labels, without losing HDR. Free, local, no upload.">
+  <meta property="og:url" content="https://tennis-evolution.pages.dev/guides/iphone-tennis-highlight-video/">
+  <meta property="og:image" content="https://tennis-evolution.pages.dev/assets/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "Make a tennis highlight video from a long iPhone recording",
+      "description": "Step-by-step: turn a 1-hour iPhone tennis recording into a highlight reel of the longest rallies, with hit count, venue and time labels, without losing HDR. Free, local, no upload.",
+      "inLanguage": "en",
+      "datePublished": "2026-10-27",
+      "dateModified": "2026-10-27",
+      "mainEntityOfPage": "https://tennis-evolution.pages.dev/guides/iphone-tennis-highlight-video/",
+      "author": {
+        "@type": "Organization",
+        "name": "Tennis Evolution",
+        "url": "https://tennis-evolution.pages.dev/"
+      },
+      "about": {
+        "@id": "https://tennis-evolution.pages.dev/#software"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Do I have to upload my video?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Everything runs on your computer; the site has no upload form."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How long does it take?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "About 3 to 5 minutes for a 47-minute 4K-class HEVC source and five rallies on an M-series Mac."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is it free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes for up to five rallies per reel (with a small watermark). Pro, a one-time $19 key, removes the cap and the watermark."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Tennis Evolution",
+          "item": "https://tennis-evolution.pages.dev/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Guides",
+          "item": "https://tennis-evolution.pages.dev/guides/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Make a tennis highlight video from a long iPhone recording",
+          "item": "https://tennis-evolution.pages.dev/guides/iphone-tennis-highlight-video/"
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap head-inner">
+      <a class="brand" href="/"><span class="brand-ball" aria-hidden="true"></span><span>Tennis Evolution</span></a>
+      <nav class="nav" aria-label="Primary">
+        <a href="/#lab">Try it</a>
+        <a href="/#agents">Agents</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/guides/">Guides</a>
+      </nav>
+      <div class="head-actions">
+        <a class="head-btn" href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="guide">
+    <article class="wrap guide-body">
+      <p class="eyebrow"><a href="/guides/">Guides</a></p>
+      <h1>Make a tennis highlight video from a long iPhone recording</h1>
+      <p class="lede">You filmed a whole session on a phone propped against the fence. Here is how to get a 3-minute reel of the best rallies out of it, with the hit count and time printed on each one, without uploading the footage anywhere or flattening the HDR.</p>
+        <h2>1. Get a list of rallies</h2>
+        <p>You need start and end times for each rally. Three ways work:</p><ul><li><b>sliceapp</b> (or any hit-detection app): export its highlight list as text, lines like <code>27:14 - 28:08 Long rally (40 hits)</code>.</li><li><b>Your own detector</b> or a spreadsheet: a JSON file <code>{"segments":[{"start":"27:14","end":"28:08","hits":40}]}</code>.</li><li><b>By hand</b>: scrub the video and type the times. Hit counts are optional.</li></ul>
+        <h2>2. Install the tool (2 minutes)</h2>
+        <pre><code>brew install ffmpeg
+pipx install git+https://github.com/bobobo2026/tennis-evolution</code></pre><p>Python 3.11+ and ffmpeg are the only requirements. macOS and Linux.</p>
+        <h2>3. Render the reel</h2>
+        <pre><code>tennis-evolution all IMG_5155.MOV --highlights highlights.txt \
+  --top 5 --place "Riverside Tennis Club" --timezone America/New_York --outdir out</code></pre><p>You get <code>out/reel_labeled.mp4</code> (with labels), <code>out/reel_plain.mp4</code>, one lossless clip per rally in <code>out/clips/</code>, and <code>manifest.json</code> with every self-check result.</p>
+        <h2>Why the iPhone HDR look survives</h2>
+        <p>iPhones record HEVC 10-bit with HLG (and often a Dolby Vision layer). Most quick editors either re-encode the clips to 8-bit SDR or drop the colour tags, so the reel looks grey. Tennis Evolution cuts each rally with <code>-c copy</code> on keyframes, so the clips are bit-exact, and encodes the reel once with the BT.2020/HLG tags passed through. Portrait orientation is baked into the picture, so platforms that ignore rotation metadata still show it upright.</p>
+        <h2>What the labels show</h2>
+        <p>Top-left: venue, the wall-clock time of that rally (recording start + offset), and where it sits in the source file. Top-right: the hit count, large. The labels are rendered as transparent PNGs, so they work even on ffmpeg builds without <code>drawtext</code>, and Chinese text renders correctly.</p>
+        <h2>Prefer to just ask an AI?</h2>
+        <p>Add the MCP server to Claude, Cursor or Codex and say “cut the five longest rallies from IMG_5155.MOV”. See <a href="/guides/ai-agent-tennis-highlights/">making tennis highlights with an AI agent</a>.</p>
+      <h2>FAQ</h2>
+      <div class="faq">
+          <details class="faq-item"><summary><span class="faq-q">Do I have to upload my video?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>No. Everything runs on your computer; the site has no upload form.</p></div></details>
+          <details class="faq-item"><summary><span class="faq-q">How long does it take?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>About 3 to 5 minutes for a 47-minute 4K-class HEVC source and five rallies on an M-series Mac.</p></div></details>
+          <details class="faq-item"><summary><span class="faq-q">Is it free?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>Yes for up to five rallies per reel (with a small watermark). Pro, a one-time $19 key, removes the cap and the watermark.</p></div></details>
+      </div>
+      <p class="cta-row"><a class="btn btn-primary" href="/#lab">Try the rally lab</a> <a class="btn btn-ghost" href="/#pricing">Free vs Pro</a></p>
+    </article>
+  </main>
+  <footer class="foot"><div class="wrap foot-bottom"><span>© 2026 Tennis Evolution</span><span class="mono">runs locally · no upload</span></div></footer>
+</body>
+</html>

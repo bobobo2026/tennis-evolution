@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thanks — your Tennis Evolution Pro key</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0A0F0C">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap head-inner">
+      <a class="brand" href="/">
+        <span class="brand-ball" aria-hidden="true"></span>
+        <span>Tennis Evolution</span>
+      </a>
+      <div class="head-actions">
+        <a class="head-btn lang" href="/zh/thanks/">中文</a>
+      </div>
+    </div>
+  </header>
+  <main class="thanks" data-thanks>
+    <div class="wrap">
+      <div class="thanks-card">
+        <p class="eyebrow">Pro · licence</p>
+        <h1>You're Pro now.</h1>
+        <p class="thanks-status" id="thanks-status"><span class="thanks-spinner" aria-hidden="true"></span><span>Waiting for the payment confirmation… this usually takes a few seconds.</span></p>
+        <p class="pay-note">Paying with WeChat or Alipay? Finish in the afdian tab — this page picks up the key automatically.</p>
+        <div id="thanks-done" hidden>
+          <p>Your licence key — keep it somewhere safe:</p>
+          <pre class="key-box mono" id="thanks-key"></pre>
+          <button class="btn btn-primary" type="button" id="thanks-copy" data-copy="" data-label="Copy key">Copy key</button>
+          <ol class="thanks-steps">
+            <li>Activate on each machine: <code>tennis-evolution license activate &lt;KEY&gt;</code></li>
+            <li>Or ask your agent: “activate my Tennis Evolution licence” and paste the key (MCP tool <code>activate_license</code>).</li>
+            <li>Check with <code>tennis-evolution license</code> — it should say <code>"tier": "pro"</code>.</li>
+          </ol>
+        </div>
+        <div class="claim" data-claim>
+          <label for="claim-input">Paid on afdian but no key here? Paste the order number:</label>
+          <div class="claim-row">
+            <input id="claim-input" class="mono" inputmode="numeric" autocomplete="off" placeholder="afdian order number">
+            <button class="btn btn-ghost" type="button" id="claim-btn">Get my key</button>
+          </div>
+          <pre class="claim-out mono" id="claim-out" hidden></pre>
+        </div>
+        <p><a href="/">← Back to the site</a></p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

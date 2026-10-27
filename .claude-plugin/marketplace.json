@@ -1,0 +1,16 @@
+{
+  "name": "tennis-evolution",
+  "owner": { "name": "bobobo2026", "url": "https://github.com/bobobo2026" },
+  "metadata": {
+    "description": "Tennis highlight reels from long recordings, as a Claude Code plugin (skill + MCP server)."
+  },
+  "plugins": [
+    {
+      "name": "tennis-evolution",
+      "source": "./",
+      "description": "Cut every rally out of a long tennis recording and burn hit count, venue and time onto a verified highlight reel.",
+      "category": "media",
+      "homepage": "https://tennis-evolution.pages.dev/"
+    }
+  ]
+}

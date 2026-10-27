@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>感谢购买 — 网球进化 Pro 许可证</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0A0F0C">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap head-inner">
+      <a class="brand" href="/zh/">
+        <span class="brand-ball" aria-hidden="true"></span>
+        <span>Tennis Evolution</span>
+      </a>
+      <div class="head-actions">
+        <a class="head-btn lang" href="/thanks/">English</a>
+      </div>
+    </div>
+  </header>
+  <main class="thanks" data-thanks>
+    <div class="wrap">
+      <div class="thanks-card">
+        <p class="eyebrow">Pro · licence</p>
+        <h1>你已经是 Pro 了。</h1>
+        <p class="thanks-status" id="thanks-status"><span class="thanks-spinner" aria-hidden="true"></span><span>正在等待支付确认……通常几秒钟。</span></p>
+        <p class="pay-note">用微信 / 支付宝付款？在爱发电标签页里完成支付，本页会自动拿到许可证。</p>
+        <div id="thanks-done" hidden>
+          <p>你的许可证（请妥善保存）：</p>
+          <pre class="key-box mono" id="thanks-key"></pre>
+          <button class="btn btn-primary" type="button" id="thanks-copy" data-copy="" data-label="复制许可证">复制许可证</button>
+          <ol class="thanks-steps">
+            <li>在每台电脑上激活：<code>tennis-evolution license activate &lt;KEY&gt;</code></li>
+            <li>或者对 Agent 说「帮我激活网球进化许可证」并贴上许可证（MCP 工具 <code>activate_license</code>）。</li>
+            <li>运行 <code>tennis-evolution license</code> 检查，应显示 <code>"tier": "pro"</code>。</li>
+          </ol>
+        </div>
+        <div class="claim" data-claim>
+          <label for="claim-input">在爱发电付了款但这里没有许可证？贴订单号找回：</label>
+          <div class="claim-row">
+            <input id="claim-input" class="mono" inputmode="numeric" autocomplete="off" placeholder="爱发电订单号">
+            <button class="btn btn-ghost" type="button" id="claim-btn">找回许可证</button>
+          </div>
+          <pre class="claim-out mono" id="claim-out" hidden></pre>
+        </div>
+        <p><a href="/zh/">← 返回首页</a></p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

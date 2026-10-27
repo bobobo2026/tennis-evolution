@@ -14,7 +14,17 @@ from .cut import ClipPlan, cache_path, cut_clips, plan_clips
 from .highlights import Segment, select_top
 from .highlights import load as load_highlights
 from .highlights import save as save_highlights
-from .labels import discover_fonts, specs_for_plans, write_overlays
+from .labels import LabelStyle, discover_fonts, specs_for_plans, write_overlays
+from .license import (
+    FREE_MAX_RALLIES,
+    PRICING_URL,
+    WATERMARK_TEXT,
+    LicenseError,
+    activate,
+    current,
+    deactivate,
+    license_path,
+)
 from .media import MediaInfo, StreamInfo, ensure_tools, keyframes, probe
 from .reel import concat_lossless, render_reel
 from .util import format_duration, format_timecode, note, warn
@@ -219,11 +229,24 @@ def _cmd_highlights(args: argparse.Namespace) -> int:
     return 0
 
 
+def free_tier_top(top: int, *, pro: bool) -> int:
+    """Clamp ``--top`` to the free-tier limit unless a Pro licence is active."""
+    if pro or 0 < top <= FREE_MAX_RALLIES:
+        return top
+    warn(
+        f"free version keeps at most {FREE_MAX_RALLIES} rallies (asked for "
+        f"{'all' if top == 0 else top}); unlock unlimited rallies and drop the watermark "
+        f"with Pro: {PRICING_URL}"
+    )
+    return FREE_MAX_RALLIES
+
+
 def _prepare(
     args: argparse.Namespace,
 ) -> tuple[MediaInfo, list[Segment], list[ClipPlan]]:
     info = probe(args.video)
     segments = load_highlights(args.highlights)
+    args.top = free_tier_top(args.top, pro=current() is not None)
     chosen = select_top(segments, args.top, args.sort)
     if not chosen:
         raise SystemExit("no highlights selected")
@@ -294,8 +317,13 @@ def _render(
             source_label=args.source_label,
         )
         fonts = discover_fonts(args.font, args.font_bold)
+        style = LabelStyle(watermark=None if current() else WATERMARK_TEXT)
         overlays = write_overlays(
-            (info.display_width, info.display_height), specs, Path(args.outdir) / "labels", fonts
+            (info.display_width, info.display_height),
+            specs,
+            Path(args.outdir) / "labels",
+            fonts,
+            style,
         )
         note(f"rendered {len(overlays)} label overlay(s)")
     note(f"encoding {out.name} from the source in one pass (this is the slow step) ...")
@@ -392,6 +420,7 @@ def _cmd_all(args: argparse.Namespace) -> int:
             "place": args.place,
             "timezone": args.timezone,
             "labels": not args.no_labels,
+            "tier": "pro" if current() else "free",
         },
         "clips": [plan.to_dict() for plan in plans],
         "reels": reels,
@@ -437,6 +466,50 @@ def _cmd_verify(args: argparse.Namespace) -> int:
         )
         note(f"wrote {args.json}")
     return 0 if ok else 1
+
+
+def _cmd_license(args: argparse.Namespace) -> int:
+    if args.action == "activate":
+        if not args.key:
+            raise SystemExit("usage: tennis-evolution license activate <KEY>")
+        try:
+            lic = activate(args.key)
+        except LicenseError as exc:
+            print(f"licence rejected: {exc}", file=sys.stderr)
+            return 1
+        print(f"Pro activated ({lic.license_id}), stored in {license_path()}")
+        return 0
+    if args.action == "deactivate":
+        print("licence removed" if deactivate() else "no stored licence")
+        return 0
+    lic = current()
+    payload = {
+        "tier": "pro" if lic else "free",
+        "license": lic.to_dict() if lic else None,
+        "free_max_rallies": FREE_MAX_RALLIES,
+        "pricing": PRICING_URL,
+    }
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    return 0
+
+
+def _cmd_mcp(args: argparse.Namespace) -> int:
+    from .mcp import serve_stdio
+
+    return serve_stdio()
+
+
+def _cmd_web(args: argparse.Namespace) -> int:
+    from .webapp import serve_forever
+
+    serve_forever(
+        host=args.host,
+        port=args.port,
+        runs_root=args.runs_root,
+        demo_dir=args.demo_dir,
+        open_browser=args.open,
+    )
+    return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -508,13 +581,31 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--json")
     p.set_defaults(func=_cmd_verify)
 
+    p = sub.add_parser("web", help="serve the local web UI (single page, no extra dependencies)")
+    p.add_argument("--host", default="127.0.0.1", help="bind address (default: 127.0.0.1)")
+    p.add_argument("--port", type=int, default=8787, help="port (default: 8787)")
+    p.add_argument("--runs-root", default=None, help="where job artifacts are written")
+    p.add_argument("--demo-dir", default=None, help="pre-rendered demo artifacts (e.g. demo_run)")
+    p.add_argument("--open", action="store_true", help="open the browser once the server is up")
+    p.set_defaults(func=_cmd_web)
+
+    p = sub.add_parser("license", help="show, activate or remove the Pro licence")
+    p.add_argument(
+        "action", nargs="?", choices=("status", "activate", "deactivate"), default="status"
+    )
+    p.add_argument("key", nargs="?", help="licence key (te1....) for `activate`")
+    p.set_defaults(func=_cmd_license)
+
+    p = sub.add_parser("mcp", help="run the Model Context Protocol server on stdio (for AI agents)")
+    p.set_defaults(func=_cmd_mcp)
+
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    if args.command in {"cut", "reel", "all", "probe", "keyframes", "verify", "concat"}:
+    if args.command in {"cut", "reel", "all", "probe", "keyframes", "verify", "concat", "web"}:
         ensure_tools()
     if getattr(args, "outdir", None):
         Path(args.outdir).mkdir(parents=True, exist_ok=True)

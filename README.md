@@ -3,6 +3,9 @@
 把一两小时的网球录像，变成几条「只剩回合」的合集，并在画面上标好**拍数 / 地点 / 拍摄时间 / 片源时间点**。
 高光检测交给任意工具或人工（例如 [sliceapp](https://sliceapp.so/tools/) 的击球列表），剪辑、拼接、角标、校验全部在本地完成。
 
+**官网 / 在线 demo：<https://tennis-evolution.pages.dev/>**（英文主站，中文在 [/zh/](https://tennis-evolution.pages.dev/zh/)；
+demo 视频是 CC0 素材跑本工具生成的，可在线播放。源码在 [`site/`](site/)，站点不提供在线渲染——渲染始终在本机。）
+
 > 这个仓库诞生于一次真实任务：47 分 29 秒的 iPhone 录音录像（1080p 竖屏 HEVC 10-bit HDR），
 > 剪出 5 个最长回合（40 / 36 / 27 / 24 / 24 拍），合成为一条 3 分 49 秒的角标合集。
 > 过程中踩到的坑（音画偏移、拼接坏帧、HDR 偏色、`drawtext` 缺失）都固化成了代码里的规则和自检项。
@@ -40,6 +43,26 @@ out/
 
 命令结束时打印 `verify PASS/FAIL`，失败会以退出码 1 结束，可直接放进脚本或交给 Agent 跑。
 
+## Web 版（本机浏览器体验）
+
+不想敲命令？起一个**只监听本机**的网页（零额外依赖，纯标准库）：
+
+```bash
+tennis-evolution web --open            # 默认 http://127.0.0.1:8787
+# 或：PYTHONPATH=src python -m tennis_evolution.webapp --port 8787
+```
+
+页面里有两个入口：
+
+- **体验成品** —— 直接播放已渲染好的 demo（工作区里存在 `demo_run/` 时），零等待看效果：
+  角标合集、5 条无损片段、每个文件的校验明细、下载。
+- **生成我的合集** —— 填本地片源路径（或把视频拖进页面，**素材只落本机、不上传任何外部服务**）、
+  粘贴击球列表、选保留条数/排序/地点/时区/画质档，实时看到阶段进度与 ffmpeg 进度条，
+  结束后看播放器、片段列表、自检表和下载。
+
+产物写在 `webapp-runs/<job_id>/`（已 gitignore），参数与自检结果与 CLI 版同构（`manifest.json`）。
+接口契约、错误码、进度模型见 [`docs/webapp.md`](docs/webapp.md)。
+
 ## 安装
 
 需要 **ffmpeg / ffprobe**（未内置，避免几十 MB 的重复分发）：
@@ -63,7 +86,7 @@ cd tennis-evolution
 pip install -e ".[dev]"
 ```
 
-> 尚未发布到 PyPI，请用上面的 git 安装方式。
+> PyPI 发布后可直接 `pipx install tennis-evolution` / `uvx tennis-evolution`；在那之前用上面的 git 安装方式。
 
 ## 输入：高光列表
 
@@ -103,6 +126,8 @@ Highlights — IMG_5155.m4a (made with sliceapp.so/tools/)
 | `all VIDEO --highlights LIST --outdir out/` | 全流程 + 自检 + manifest |
 | `verify FILE` | 单独跑一次自检 |
 | `concat CLIP... --out FILE` | 无损拼接备选路径（会主动报告时间戳问题，见下） |
+| `license [activate KEY\|deactivate]` | 查看 / 激活 / 移除 Pro 许可证 |
+| `mcp` | 以 MCP server（stdio）运行，给 AI Agent 调用 |
 
 ## 为什么是这个做法
 
@@ -140,16 +165,60 @@ Highlights — IMG_5155.m4a (made with sliceapp.so/tools/)
 - **旋转**：默认把竖屏方向烧进画面（`1080×1920`），避免部分播放器/平台忽略旋转元数据；`--keep-rotation` 保留元数据方式。
 - **时区**：角标钟点 = 源片 `creation_time` + 该回合起点，`--timezone` 决定显示时区；没有 `creation_time` 时退回文件修改时间并告警。
 
-## 作为 Agent Skill 使用
+## 在 AI Agent 里用（MCP / Claude Code 插件 / Skill）
 
-`skills/tennis-evolution/SKILL.md` 是一份可直接加载的技能说明（适用 DeepSeek Harness / Claude 等支持 skill 的 Agent）：
+<!-- mcp-name: io.github.bobobo2026/tennis-evolution -->
 
-```bash
-mkdir -p ~/.dsh/skills && cp -r skills/tennis-evolution ~/.dsh/skills/
+对 Agent 说一句「把这段录像里最长的五个回合剪成带角标的合集」，剩下的它会自己跑完。
+
+**MCP（Claude Desktop / Claude Code / Cursor / Codex / Windsurf 等任意 MCP 客户端）**：
+
+```json
+{
+  "mcpServers": {
+    "tennis-evolution": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/bobobo2026/tennis-evolution", "tennis-evolution", "mcp"]
+    }
+  }
+}
 ```
 
-之后对 Agent 说「把这段录像里最长的五个回合剪成带角标的合集」，它会按 SKILL.md 调用
-`tennis-evolution all`，并依据 `manifest.json` 的 `ok` 字段判断是否需要重试。
+Claude Code 一行装好：
+
+```bash
+claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp
+```
+
+暴露的工具：`probe_video` → `rank_highlights` → `start_highlight_reel`（后台任务）→ `get_job`（轮询，完成后返回
+manifest）→ `verify_video`；以及 `license_status` / `activate_license`。渲染在子进程里跑，长任务不会卡住 Agent。
+
+**Claude Code 插件**（Skill + MCP 一起装）：
+
+```bash
+/plugin marketplace add bobobo2026/tennis-evolution
+/plugin install tennis-evolution@tennis-evolution
+```
+
+**只要 Skill**：`skills/tennis-evolution/SKILL.md` 可直接复制到任意支持 skill 的 Agent（如 `~/.claude/skills/`、`~/.dsh/skills/`）。
+
+## 免费版与 Pro
+
+| | 免费 | Pro（一次性 $19 / ¥138，永久） |
+| --- | --- | --- |
+| 本地渲染、无损切片、自检、MCP | ✅ | ✅ |
+| 每次保留的回合数 | 最多 5 段 | 不限（`--top 0` = 全部） |
+| 角标合集右下角水印 | 有（`tennis-evolution · free`） | 无 |
+
+购买：<https://tennis-evolution.pages.dev/#pricing>（海外信用卡 / Apple Pay / Google Pay，国内微信 / 支付宝）。
+付款后页面直接给出 `te1.…` 许可证：
+
+```bash
+tennis-evolution license activate te1.xxxxx      # 或环境变量 TENNIS_EVOLUTION_LICENSE
+tennis-evolution license                          # 查看状态
+```
+
+许可证是 Ed25519 签名、**离线校验**，激活和渲染都不联网，素材永远不出本机。
 
 ## 检测环节怎么办？
 

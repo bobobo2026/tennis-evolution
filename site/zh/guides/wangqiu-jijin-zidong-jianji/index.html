@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>手机录的网球视频怎么自动剪成集锦？带拍数、地点、时间角标（本地免费）</title>
+  <meta name="description" content="手把手：用网球进化把 iPhone 录的整场网球剪成最长回合集锦，自动标拍数、球馆、时间，保留 HDR，不上传素材，免费可用。">
+  <link rel="canonical" href="https://tennis-evolution.pages.dev/zh/guides/wangqiu-jijin-zidong-jianji/">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#0A0F0C">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="把一小时的网球录像，自动剪成带拍数角标的集锦">
+  <meta property="og:description" content="手把手：用网球进化把 iPhone 录的整场网球剪成最长回合集锦，自动标拍数、球馆、时间，保留 HDR，不上传素材，免费可用。">
+  <meta property="og:url" content="https://tennis-evolution.pages.dev/zh/guides/wangqiu-jijin-zidong-jianji/">
+  <meta property="og:image" content="https://tennis-evolution.pages.dev/assets/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "把一小时的网球录像，自动剪成带拍数角标的集锦",
+      "description": "手把手：用网球进化把 iPhone 录的整场网球剪成最长回合集锦，自动标拍数、球馆、时间，保留 HDR，不上传素材，免费可用。",
+      "inLanguage": "zh-CN",
+      "datePublished": "2026-10-27",
+      "dateModified": "2026-10-27",
+      "mainEntityOfPage": "https://tennis-evolution.pages.dev/zh/guides/wangqiu-jijin-zidong-jianji/",
+      "author": {
+        "@type": "Organization",
+        "name": "Tennis Evolution",
+        "url": "https://tennis-evolution.pages.dev/"
+      },
+      "about": {
+        "@id": "https://tennis-evolution.pages.dev/#software"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "视频要上传吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "不用。全部在你自己的电脑上处理，网站没有上传入口。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "要多久？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "47 分钟的 iPhone HDR 原片剪 5 个回合，M 系列 Mac 约 3–5 分钟。"
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "收费吗？",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "每条合集 5 段以内免费（带小水印）；Pro 一次性 ¥138，解锁全部回合并去水印，支持微信和支付宝。"
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Tennis Evolution",
+          "item": "https://tennis-evolution.pages.dev/zh/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "指南",
+          "item": "https://tennis-evolution.pages.dev/zh/guides/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "把一小时的网球录像，自动剪成带拍数角标的集锦",
+          "item": "https://tennis-evolution.pages.dev/zh/guides/wangqiu-jijin-zidong-jianji/"
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap head-inner">
+      <a class="brand" href="/zh/"><span class="brand-ball" aria-hidden="true"></span><span>网球进化</span></a>
+      <nav class="nav" aria-label="主导航">
+        <a href="/zh/#lab">试一试</a>
+        <a href="/zh/#agents">Agent</a>
+        <a href="/zh/#pricing">价格</a>
+        <a href="/zh/guides/">指南</a>
+      </nav>
+      <div class="head-actions">
+        <a class="head-btn" href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="guide">
+    <article class="wrap guide-body">
+      <p class="eyebrow"><a href="/zh/guides/">指南</a></p>
+      <h1>把一小时的网球录像，自动剪成带拍数角标的集锦</h1>
+      <p class="lede">手机靠在铁丝网上录了一整场，想把最精彩的几个回合挑出来发朋友圈或小红书？下面三步，在自己电脑上完成，素材不上传。</p>
+        <h2>第一步：准备回合列表</h2>
+        <p>需要每个回合的开始和结束时间，三种来源都行：</p><ul><li><b>sliceapp</b> 等击球检测工具导出的文本，例如 <code>27:14 - 28:08 Long rally (40 hits)</code>；</li><li>自己整理的 JSON：<code>{"segments":[{"start":"27:14","end":"28:08","hits":40}]}</code>；</li><li>手动拖进度条记下时间，拍数可不填。</li></ul>
+        <h2>第二步：安装（约 2 分钟）</h2>
+        <pre><code>brew install ffmpeg
+pipx install git+https://github.com/bobobo2026/tennis-evolution</code></pre>
+        <h2>第三步：一条命令出片</h2>
+        <pre><code>tennis-evolution all IMG_5155.MOV --highlights highlights.txt \
+  --top 5 --place "宁波 ECHO Tennis" --timezone Asia/Shanghai --outdir out</code></pre><p>得到带角标合集 <code>reel_labeled.mp4</code>、无角标合集、每个回合的无损片段，以及记录全部自检结果的 <code>manifest.json</code>。</p>
+        <h2>为什么画面不会发灰</h2>
+        <p>iPhone 录的是 HEVC 10-bit HLG（常带杜比视界）。很多剪辑方式会转成 8-bit 或丢掉色彩标签，成片发灰。网球进化切片用关键帧对齐的 <code>-c copy</code>（比特级无损），合集只编码一次并透传 BT.2020/HLG 标签，竖屏方向直接烧进画面。</p>
+        <h2>角标长什么样</h2>
+        <p>左上：球馆名、该回合的真实钟点（录制时间 + 偏移）、片源时间点；右上：大号拍数。中文字体渲染正常，不依赖 ffmpeg 的 drawtext。</p>
+        <h2>不想敲命令？</h2>
+        <p>可以让 Claude、Cursor 等 AI Agent 直接帮你剪，见 <a href="/zh/guides/ai-agent-jian-wangqiu/">用 AI Agent 剪网球集锦</a>；也可以运行 <code>tennis-evolution web --open</code> 在本机网页里点选操作。</p>
+      <h2>常见问题</h2>
+      <div class="faq">
+          <details class="faq-item"><summary><span class="faq-q">视频要上传吗？</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>不用。全部在你自己的电脑上处理，网站没有上传入口。</p></div></details>
+          <details class="faq-item"><summary><span class="faq-q">要多久？</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>47 分钟的 iPhone HDR 原片剪 5 个回合，M 系列 Mac 约 3–5 分钟。</p></div></details>
+          <details class="faq-item"><summary><span class="faq-q">收费吗？</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>每条合集 5 段以内免费（带小水印）；Pro 一次性 ¥138，解锁全部回合并去水印，支持微信和支付宝。</p></div></details>
+      </div>
+      <p class="cta-row"><a class="btn btn-primary" href="/zh/#lab">在线试玩回合实验室</a> <a class="btn btn-ghost" href="/zh/#pricing">免费版 / Pro</a></p>
+    </article>
+  </main>
+  <footer class="foot"><div class="wrap foot-bottom"><span>© 2026 Tennis Evolution</span><span class="mono">本地运行 · 素材不上传</span></div></footer>
+</body>
+</html>

@@ -1,0 +1,9 @@
+# Cloudflare Pages redirects — first matching rule wins.
+# Canonical URLs: "/" (English) and "/zh/" (Chinese), each with a trailing slash.
+
+/index.html    /     301
+/zh/index.html /zh/  301
+/zh            /zh/  301
+
+# Language entry points used by older links and the app UI.
+/en           /     301

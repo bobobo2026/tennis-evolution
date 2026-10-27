@@ -1,0 +1,31 @@
+{
+  "name": "tennis-evolution",
+  "version": "0.2.0",
+  "description": "Turn a long tennis recording into a labeled highlight reel (hit count, venue, wall clock, source timestamp). Runs locally with ffmpeg; lossless clips, one-pass reel, self-checks.",
+  "author": {
+    "name": "bobobo2026",
+    "url": "https://github.com/bobobo2026"
+  },
+  "homepage": "https://tennis-evolution.pages.dev/",
+  "repository": "https://github.com/bobobo2026/tennis-evolution",
+  "license": "MIT",
+  "keywords": [
+    "tennis",
+    "highlight",
+    "video",
+    "ffmpeg",
+    "sports",
+    "mcp"
+  ],
+  "mcpServers": {
+    "tennis-evolution": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/bobobo2026/tennis-evolution",
+        "tennis-evolution",
+        "mcp"
+      ]
+    }
+  }
+}

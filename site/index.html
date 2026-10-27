@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tennis Evolution — Automatic Tennis Highlight Reels with Hit Counts (Local, Open Source)</title>
+  <meta name="description" content="Cut every rally from a long tennis recording, burn hit count, venue and timestamp onto the picture, and get a verified reel. Local-first, open source, MIT.">
+  <link rel="canonical" href="https://tennis-evolution.pages.dev/">
+  <link rel="alternate" hreflang="en" href="https://tennis-evolution.pages.dev/">
+  <link rel="alternate" hreflang="zh-CN" href="https://tennis-evolution.pages.dev/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://tennis-evolution.pages.dev/">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#0A0F0C">
+  <meta name="color-scheme" content="dark">
+  <meta name="author" content="Tennis Evolution">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Tennis Evolution">
+  <meta property="og:title" content="A 47-minute tennis recording in. A 3-minute highlight reel out.">
+  <meta property="og:description" content="Cut every rally from a long tennis recording, burn hit count, venue and timestamp onto the picture, and get a verified reel. Local-first, open source, MIT.">
+  <meta property="og:url" content="https://tennis-evolution.pages.dev/">
+  <meta property="og:image" content="https://tennis-evolution.pages.dev/assets/og.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Tennis Evolution: a 47:29 recording becomes a 3:49 reel with hit count, venue and timestamp labels burned into the picture.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="zh_CN">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="A 47-minute tennis recording in. A 3-minute highlight reel out.">
+  <meta name="twitter:description" content="Cut every rally from a long tennis recording, burn hit count, venue and timestamp onto the picture, and get a verified reel. Local-first, open source, MIT.">
+  <meta name="twitter:image" content="https://tennis-evolution.pages.dev/assets/og.jpg">
+  <meta name="twitter:image:alt" content="Tennis Evolution: a 47:29 recording becomes a 3:49 reel with hit count, venue and timestamp labels burned into the picture.">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://tennis-evolution.pages.dev/#software",
+        "name": "Tennis Evolution",
+        "alternateName": [
+          "网球进化",
+          "tennis-evolution"
+        ],
+        "description": "Local-first tool that turns a long tennis recording into highlight reels: lossless keyframe cuts, one-pass assembly, burned-in corner labels with hit count, venue, wall clock and source timestamp, and self-checks written to manifest.json.",
+        "url": "https://tennis-evolution.pages.dev/",
+        "applicationCategory": "MultimediaApplication",
+        "applicationSubCategory": "Video editing",
+        "operatingSystem": "macOS, Linux",
+        "softwareRequirements": "Python 3.11 or newer, with ffmpeg and ffprobe on PATH.",
+        "softwareVersion": "0.2.0",
+        "inLanguage": [
+          "en",
+          "zh-CN"
+        ],
+        "license": "https://opensource.org/licenses/MIT",
+        "isAccessibleForFree": true,
+        "codeRepository": "https://github.com/bobobo2026/tennis-evolution",
+        "downloadUrl": "https://github.com/bobobo2026/tennis-evolution",
+        "screenshot": "https://tennis-evolution.pages.dev/assets/og.jpg",
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Free",
+            "price": "0",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+          },
+          {
+            "@type": "Offer",
+            "name": "Pro licence (one-time)",
+            "price": "19",
+            "priceCurrency": "USD",
+            "url": "https://tennis-evolution.pages.dev/#pricing",
+            "availability": "https://schema.org/InStock"
+          }
+        ],
+        "featureList": [
+          "Lossless keyframe-accurate cuts with stream copy, keeping HDR, 10-bit colour and rotation metadata",
+          "Single-pass reel assembly (trim, concat, one encode) instead of concat demuxer stream copy",
+          "Burned-in corner labels: hit count, venue, wall clock and source timestamp rendered as PNG overlays",
+          "Self-checks per output file written to a machine-readable manifest.json",
+          "MCP server so AI agents (Claude, Cursor, Codex) can render reels on request"
+        ],
+        "keywords": "tennis highlight video, cut tennis rallies, tennis rally cutter, slice app alternative, iPhone tennis video highlights, HDR HEVC tennis video, open source tennis video editor"
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://tennis-evolution.pages.dev/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Do I need a hit detector?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Bring any list of time ranges: sliceapp's export, your own detector, or a text file you typed by hand. Detection is deliberately out of scope, because a hit counter tuned to one venue's reverb makes the whole pipeline brittle. If you already export ranges from sliceapp, this doubles as a slice app alternative: the export drops straight in."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does it work with iPhone HDR video?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. iPhone tennis video highlights keep their HLG tags, 10-bit colour and rotation metadata: the lossless cuts are untouched, and the reel comes out as an HDR HEVC tennis video at the same 10-bit depth. Dolby Vision's dynamic metadata cannot be written back by x265 and is dropped on re-encode; the HDR10/HLG base layer stays intact."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is it macOS only?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The CLI runs on macOS and Linux with ffmpeg on PATH and Python 3.11 or newer. A packaged Mac app is on the roadmap; star the repository to follow it."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I try it without installing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Every clip on this page is pre-rendered, so you can judge the output first. There is no online renderer on purpose: generating one means uploading an hour of your footage to someone else's server."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does it take?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A 47-minute source with five rallies takes about 3 to 5 minutes end to end on an M-series Mac, almost all of it the single x265 encode. The local web UI shows live progress for each stage."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What does it cost?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The free version costs nothing: local rendering, the MCP server and every self-check, up to five rallies per reel with a small watermark. Pro is a one-time $19 (¥138) licence key that unlocks every rally and removes the watermark. Pay by card, Apple Pay, Google Pay, WeChat or Alipay; the key is verified offline, so nothing ever phones home."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can ChatGPT, Claude or Cursor make a tennis highlight video for me?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, through MCP. Add the Tennis Evolution MCP server (one line for Claude Code, a JSON snippet for Claude Desktop, Cursor, Codex or Windsurf) and ask in plain words, for example “cut the five longest rallies from match.MOV and label them with my club name”. The agent calls probe_video, rank_highlights, start_highlight_reel and get_job, and reports the self-check result. Rendering still runs on your own computer."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What does Pro add, and is it a subscription?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No subscription. Pro is a single $19 payment for an offline licence key: every rally instead of five, no watermark, use it on all your machines, free updates for the 0.x line. Activate it with “tennis-evolution license activate KEY” or ask your agent to call activate_license."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-head">
+    <div class="wrap head-inner">
+      <a class="brand" href="/" aria-label="Tennis Evolution home">
+        <span class="brand-ball" aria-hidden="true"></span>
+        <span>Tennis Evolution</span>
+        <span class="brand-sub">open source · v0.2</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="#lab">Try it</a>
+        <a href="#labels">Before / after</a>
+        <a href="#demo">Demo</a>
+        <a href="#how">How it works</a>
+        <a href="#agents">Agents</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="head-actions">
+        <a class="head-btn lang" href="/zh/" hreflang="zh-CN" lang="zh-CN" aria-label="Switch to Chinese">中文</a>
+        <a class="head-btn" href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ================= hero ================= -->
+    <section class="hero">
+      <div class="wrap">
+        <p class="eyebrow">Open source · runs on your Mac · works with your AI agent</p>
+
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1>A <span class="hl">47-minute</span> <br>tennis recording in. <br>A <span class="hl">3-minute</span> <br>highlight reel out.</h1>
+            <p class="lede">Tennis Evolution cuts every rally out of a long phone recording, burns the hit count, venue, wall clock and source timestamp onto the picture, and checks the result before handing it over. Your footage never leaves your machine — no upload, no account, no cloud.</p>
+            <div class="cta-row">
+              <a class="btn btn-primary" href="#demo">See a real reel <span class="arrow" aria-hidden="true">↓</span></a>
+              <a class="btn btn-ghost" href="#install">Install in one line</a>
+            </div>
+          </div>
+
+          <aside class="hero-facts" aria-label="The reference run at a glance">
+            <p class="facts-label">The reference run</p>
+            <dl class="facts">
+              <div>
+                <dt>Source → reel</dt>
+                <dd><span class="num">47:29</span><span class="arrow" aria-hidden="true">→</span><span class="num lime">3:49</span></dd>
+              </div>
+              <div>
+                <dt>Longest rallies kept</dt>
+                <dd>5<span class="unit">of 131</span></dd>
+              </div>
+              <div>
+                <dt>Most hits in one rally</dt>
+                <dd>40<span class="unit">hits</span></dd>
+              </div>
+              <div>
+                <dt>Self-checks per file</dt>
+                <dd>9<span class="pass">PASS</span></dd>
+              </div>
+            </dl>
+            <p class="facts-note">One handheld iPhone take: 1080×1920, HEVC 10-bit HLG, 47 minutes, no second camera.</p>
+          </aside>
+        </div>
+
+        <!-- source → reel diagram, drawn in CSS so it costs no request -->
+        <figure class="record">
+          <figcaption class="visually-hidden">The reference run: a 47 minute 29 second iPhone recording in, one 3 minute 49 second reel of the five longest rallies out.</figcaption>
+          <p class="record-k mono" aria-hidden="true">
+            <span>Source</span>
+            <span><b>47:29.2</b> · iPhone HEVC 10-bit HLG · 1080×1920</span>
+          </p>
+          <div class="track track-src" aria-hidden="true">
+            <span class="rs rs1" data-t="2:15"></span>
+            <span class="rs rs2" data-t="14:50"></span>
+            <span class="rs rs3" data-t="27:14"></span>
+            <span class="rs rs4" data-t="34:28"></span>
+            <span class="rs rs5" data-t="38:49"></span>
+          </div>
+          <p class="record-join mono" aria-hidden="true">Cut on keyframes · assembled in one encode pass</p>
+          <div class="track track-reel" aria-hidden="true">
+            <span>40</span><span>36</span><span>27</span><span>24</span><span>24</span>
+          </div>
+          <p class="record-k record-k-end mono" aria-hidden="true">
+            <span>Reel</span>
+            <span><b>3:49</b> · 5 segments · hits printed in each block</span>
+          </p>
+        </figure>
+      </div>
+    </section>
+
+
+    <!-- ================= rally lab ================= -->
+    <section class="section lab" id="lab">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">01 / Try it</p>
+            <h2>Drag the slider. Watch the reel build itself.</h2>
+          </div>
+          <p class="sec-lede">This is the reference recording: 47 minutes, 131 rallies. Pick how many to keep and how to order them — the timeline, the reel and the corner label update exactly the way the tool will cut them.</p>
+        </div>
+
+        <div class="lab-panel" data-lab data-place="Riverside Tennis Club" data-unit="hits" data-src="Source">
+          <div class="lab-controls">
+            <label class="lab-keep" for="lab-range">Keep the <output id="lab-n" class="num">5</output> best rallies</label>
+            <div class="lab-range-wrap">
+              <input type="range" id="lab-range" min="1" max="20" value="5" step="1">
+              <div class="lab-tiers mono" aria-hidden="true"><span>Free · up to 5</span><span>Pro · all 131</span></div>
+            </div>
+            <div class="seg lab-sort" role="group">
+              <button class="seg-btn" type="button" data-sort="hits" aria-pressed="true">Longest first</button>
+              <button class="seg-btn" type="button" data-sort="start" aria-pressed="false">In order played</button>
+            </div>
+          </div>
+
+          <div class="lab-timeline" aria-hidden="true">
+            <div class="lab-ticks" id="lab-ticks"></div>
+            <div class="lab-axis mono"><span>0:00</span><span>15:00</span><span>30:00</span><span>47:29</span></div>
+          </div>
+
+          <dl class="lab-stats">
+            <div><dt>Reel length</dt><dd class="num" id="lab-len">3:49</dd></div>
+            <div><dt>Rallies</dt><dd class="num"><span id="lab-count">5</span><span class="unit">/ 131</span></dd></div>
+            <div><dt>Hits on screen</dt><dd class="num" id="lab-hits">151</dd></div>
+          </dl>
+
+          <div class="lab-body">
+            <ol class="lab-strip" id="lab-strip"></ol>
+            <figure class="lab-preview" aria-live="polite">
+              <figcaption class="mono">Label preview · hover a rally</figcaption>
+              <div class="lab-screen">
+                <div class="lab-card">
+                  <b id="lp-place">Riverside Tennis Club</b>
+                  <span id="lp-clock">2026-10-24 17:44</span>
+                  <small id="lp-src">Source 27:14</small>
+                </div>
+                <div class="lab-badge"><b id="lp-hits">40</b><span>hits</span></div>
+                <div class="lab-court" aria-hidden="true"></div>
+              </div>
+            </figure>
+          </div>
+
+          <div class="lab-pro" id="lab-pro" hidden>
+            <p>Rallies beyond five are a Pro feature — one payment, every rally, no watermark.</p>
+            <a class="btn btn-primary" href="#pricing">Unlock Pro · $19 <span class="arrow" aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= before / after ================= -->
+    <section class="section" id="labels">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">02 / Labels</p>
+            <h2>Same footage. The labels do the talking.</h2>
+          </div>
+          <p class="sec-lede">Every segment carries the hit count, the venue, the wall clock of that rally and where it came from in the source file — so a clip still makes sense once it's out of context.</p>
+        </div>
+
+        <div class="compare-bar">
+          <div class="seg" role="group" aria-label="Corner labels on or off">
+            <button class="seg-btn" type="button" data-mode="plain" aria-pressed="false">Without labels</button>
+            <button class="seg-btn" type="button" data-mode="labeled" aria-pressed="true">With labels</button>
+          </div>
+          <p class="compare-file mono"><span class="dot" aria-hidden="true"></span><span data-file-name>demo-reel.mp4</span></p>
+        </div>
+
+        <div class="media-frame media-16x9" data-media>
+          <video id="compare-video" controls playsinline preload="metadata" width="1280" height="720"
+                 poster="assets/demo-reel.jpg" src="assets/demo-reel.mp4"
+                 data-mode="labeled"
+                 data-src-labeled="assets/demo-reel.mp4" data-src-plain="assets/demo-plain.mp4"
+                 data-poster-labeled="assets/demo-reel.jpg" data-poster-plain="assets/demo-plain.jpg"
+                 aria-label="Sample rally played with corner labels. Use the buttons above to switch to the same footage without labels."></video>
+        </div>
+
+        <p class="compare-note">
+          Switching keeps the playback position, so you see the same frame with and without the overlay.
+          <span>PNG overlay · Pillow</span>
+        </p>
+        <noscript><p class="compare-note">The label toggle needs JavaScript. The reel above still plays, labels included.</p></noscript>
+      </div>
+    </section>
+
+    <!-- ================= demo ================= -->
+    <section class="section" id="demo">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">03 / The reel</p>
+            <h2>Watch it, then run it on your own recording.</h2>
+          </div>
+          <p class="sec-lede">Every tennis highlight video here is the tool's real output, not a mock-up. The hero numbers come from one 47-minute phone recording; the player below is a shorter CC0 sample cut by the same pipeline.</p>
+        </div>
+
+        <div class="media-frame media-16x9 player" data-media id="demo-player">
+          <video id="reel" controls playsinline preload="metadata" width="1280" height="720"
+                 poster="assets/demo-reel.jpg" src="assets/demo-reel.mp4"
+                 aria-label="Sample highlight reel with burned-in corner labels"></video>
+          <div class="player-cover">
+            <button class="player-cover-btn" type="button" aria-label="Play the sample highlight reel, 1 minute 39 seconds">
+              <span class="player-ring" aria-hidden="true"></span>
+              <span>Play the reel</span>
+              <span class="player-meta mono"><strong>1:39</strong> · 1280×720</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="demo-meta mono">reel_labeled.mp4 · h.264 · 1280×720 · 1:39 · labels burned in</p>
+        <p class="demo-sample mono">Sample footage: CC0 clips run through the same pipeline — source 2:16, four rallies, reel 1:39.</p>
+
+        <div class="clips">
+          <article class="clip">
+            <div class="media-frame media-16x9" data-media>
+              <video controls playsinline preload="metadata" width="1280" height="720"
+                     poster="assets/clip-01.jpg" src="assets/clip-01.mp4"
+                     aria-label="Lossless cut 01 from the sample reel"></video>
+            </div>
+            <div class="clip-meta">
+              <p class="clip-k mono">Lossless cut · 01<span class="clip-dur">0:28</span></p>
+              <p class="clip-hits">clip-01<span>.mp4</span></p>
+              <p class="clip-src">Bit-exact stream copy, labels burned in.</p>
+            </div>
+          </article>
+          <article class="clip">
+            <div class="media-frame media-16x9" data-media>
+              <video controls playsinline preload="metadata" width="1280" height="720"
+                     poster="assets/clip-02.jpg" src="assets/clip-02.mp4"
+                     aria-label="Lossless cut 02 from the sample reel"></video>
+            </div>
+            <div class="clip-meta">
+              <p class="clip-k mono">Lossless cut · 02<span class="clip-dur">0:19</span></p>
+              <p class="clip-hits">clip-02<span>.mp4</span></p>
+              <p class="clip-src">Keyframe-aligned, no reference frames lost.</p>
+            </div>
+          </article>
+          <article class="clip">
+            <div class="media-frame media-16x9" data-media>
+              <video controls playsinline preload="metadata" width="1280" height="720"
+                     poster="assets/clip-03.jpg" src="assets/clip-03.mp4"
+                     aria-label="Lossless cut 03 from the sample reel"></video>
+            </div>
+            <div class="clip-meta">
+              <p class="clip-k mono">Lossless cut · 03<span class="clip-dur">0:23</span></p>
+              <p class="clip-hits">clip-03<span>.mp4</span></p>
+              <p class="clip-src">No re-encode, so no generation loss.</p>
+            </div>
+          </article>
+        </div>
+
+        <p class="demo-note">These are lossless stream copies — cut on keyframes, nothing is re-encoded. The demo source is SDR; on a real iPhone HDR recording the 10-bit HLG frames and rotation metadata pass through untouched.</p>
+      </div>
+    </section>
+
+    <!-- ================= paper spread ================= -->
+    <div class="paper">
+      <section class="section" id="how">
+        <div class="wrap">
+          <div class="sec-head">
+            <div>
+              <p class="sec-index mono">04 / Pipeline</p>
+              <h2>Four moves, and one of them is refusing a shortcut.</h2>
+            </div>
+            <p class="sec-lede">The interesting decisions are all at the edges: where a cut is allowed to land, how the segments get joined, and what counts as done.</p>
+          </div>
+
+          <ol class="steps">
+            <li class="step">
+              <span class="step-n mono" aria-hidden="true">01</span>
+              <div class="step-body">
+                <h3>Bring a highlight list</h3>
+                <p>Any tool that emits time ranges works: sliceapp's export, your own detector, or a text file you typed. Detection is deliberately out of scope.</p>
+              </div>
+              <span class="step-tag">txt · json</span>
+            </li>
+            <li class="step">
+              <span class="step-n mono" aria-hidden="true">02</span>
+              <div class="step-body">
+                <h3>Cut on keyframes, not on milliseconds</h3>
+                <p>Stream copy is bit-exact and keeps HDR, 10-bit and rotation metadata; cuts snap to the nearest keyframe, which is why the pipeline never re-encodes a clip.</p>
+              </div>
+              <span class="step-tag">-c copy</span>
+            </li>
+            <li class="step">
+              <span class="step-n mono" aria-hidden="true">03</span>
+              <div class="step-body">
+                <h3>Assemble in one pass</h3>
+                <p>Rallies are trimmed and concatenated into a single encode. The obvious concat-demuxer shortcut produced a permanent 1.01 s audio offset and broken HEVC reference frames, so this tool refuses it and reports the problem instead.</p>
+              </div>
+              <span class="step-tag">trim → concat</span>
+            </li>
+            <li class="step">
+              <span class="step-n mono" aria-hidden="true">04</span>
+              <div class="step-body">
+                <h3>Verify before it counts as done</h3>
+                <p>Every output is checked for clean decode, zero start offset, A/V duration match, non-black first/last frames and non-silent audio. Failing checks make the command exit non-zero.</p>
+              </div>
+              <span class="step-tag">manifest.json</span>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section" id="outputs">
+        <div class="wrap">
+          <div class="sec-head">
+            <div>
+              <p class="sec-index mono">05 / Output</p>
+              <h2>What you get.</h2>
+            </div>
+            <p class="sec-lede">One directory per run. Nothing is hidden in a project file: the reel, the cuts, the label layers and the report sit side by side — a tennis rally cutter that hands you files, not a subscription.</p>
+          </div>
+
+          <div class="out-grid">
+            <div>
+              <ul class="files">
+                <li><code>reel_labeled.mp4</code><span>The reel, labels burned in — the file you upload.</span></li>
+                <li><code>reel_plain.mp4</code><span>Same assembly, clean picture, for your own titles.</span></li>
+                <li><code>clips/</code><span>One lossless cut per rally. Original HDR, rotation burned in.</span></li>
+                <li><code>labels/*.png</code><span>Transparent overlays, reusable in any editor.</span></li>
+                <li><code>highlights.normalized.json</code><span>The segment list actually used.</span></li>
+                <li><code>manifest.json</code><span>Every parameter and every check result.</span></li>
+              </ul>
+              <blockquote class="manifest-quote">
+                The manifest is the contract: every parameter and every check result, machine-readable.
+                <em>A non-zero exit code means a check failed — scripts and agents can trust the run without watching the video.</em>
+              </blockquote>
+              <div class="checks" aria-label="Self-checks run on every output file">
+                <span>decode clean</span>
+                <span>start offset</span>
+                <span>a/v duration match</span>
+                <span>expected duration</span>
+                <span>frame not black</span>
+                <span>audio not silent</span>
+              </div>
+            </div>
+
+            <div class="anatomy">
+              <p class="anatomy-cap mono">The label, enlarged</p>
+              <div class="label-shot" data-media>
+                <img src="assets/frame-label.jpg" width="1600" height="900" loading="lazy" decoding="async"
+                     alt="A tennis rally frame with the corner label enlarged: hit count, venue, wall clock and the source timestamp of that rally.">
+              </div>
+              <dl class="anatomy-list">
+                <div>
+                  <dt>Hits</dt>
+                  <dd><b>14</b>The shot count, and the sort key for the reel.</dd>
+                </div>
+                <div>
+                  <dt>Venue</dt>
+                  <dd>Whatever you pass with <code>--place</code> — Riverside Tennis Club in this sample.</dd>
+                </div>
+                <div>
+                  <dt>Wall clock</dt>
+                  <dd>Recording start plus the rally offset, in the timezone you choose.</dd>
+                </div>
+                <div>
+                  <dt>Source</dt>
+                  <dd><b>0:02</b>Where the rally sits in the original file.</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="install">
+        <div class="wrap">
+          <div class="sec-head">
+            <div>
+              <p class="sec-index mono">06 / Install</p>
+              <h2>Install in one line.</h2>
+            </div>
+            <p class="sec-lede">Not on PyPI yet, so install straight from the repository. ffmpeg has to be on your PATH — the tool will not quietly bundle 40 MB of it for you.</p>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-head">
+              <span>Terminal — <b>install + run</b></span>
+              <button class="copy" type="button" data-label="Copy"
+                      data-copy="pipx install git+https://github.com/bobobo2026/tennis-evolution"
+                      aria-label="Copy the install command to the clipboard">Copy</button>
+            </div>
+            <pre><code><span class="c-dim"># ffmpeg first: brew install ffmpeg  ·  sudo apt install ffmpeg fonts-noto-cjk</span>
+<span class="c-cmd">pipx install git+https://github.com/bobobo2026/tennis-evolution</span>
+
+<span class="c-dim"># a highlight list from sliceapp, your detector, or by hand</span>
+<span class="c-cmd">tennis-evolution all IMG_5155.MOV --highlights highlights.txt --top 5 --place "Your Club" --timezone Asia/Shanghai --outdir out</span></code></pre>
+          </div>
+          <p class="install-note">Requires Python 3.11+ and ffmpeg/ffprobe. macOS and Linux. Source, issues and the full pipeline notes live on <a href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub</a>.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= agents ================= -->
+    <section class="section agents" id="agents">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">07 / Agents</p>
+            <h2>Or just ask your agent.</h2>
+          </div>
+          <p class="sec-lede">Tennis Evolution ships an MCP server, a Claude Code plugin and a portable skill. Any agent that speaks MCP — Claude, Cursor, Codex, Windsurf — can probe the file, rank the rallies, render the reel and read the self-checks. The free version works from every agent.</p>
+        </div>
+
+        <div class="agents-grid">
+          <div class="chat" data-chat aria-label="Example agent session">
+            <p class="chat-row chat-you">Cut the five longest rallies out of ~/Movies/match.MOV and label them Riverside Tennis Club.</p>
+            <p class="chat-row chat-tool"><code>probe_video</code><span>47:29 · HEVC 10-bit HLG · portrait 1080×1920</span></p>
+            <p class="chat-row chat-tool"><code>rank_highlights</code><span>131 rallies · keeping 40, 36, 27, 24, 24 hits</span></p>
+            <p class="chat-row chat-tool"><code>start_highlight_reel</code><span>job 3f9c21 · running in the background</span></p>
+            <p class="chat-row chat-tool chat-pass"><code>get_job</code><span>done · verify PASS · reel_labeled.mp4 (3:49)</span></p>
+            <p class="chat-row chat-agent">Done. Your reel is at ~/Movies/out/reel_labeled.mp4 — 5 rallies, 3:49, every self-check passed.</p>
+          </div>
+
+          <div class="setup" data-tabs>
+            <div class="setup-tabs" role="tablist">
+              <button type="button" role="tab" aria-selected="true" data-tab="code">Claude Code</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="json">Claude Desktop · Cursor</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="plugin">Plugin</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="skill">Any agent</button>
+            </div>
+            <div class="terminal setup-pane" role="tabpanel" data-pane="code">
+              <div class="terminal-head"><span>Terminal</span><button class="copy" type="button" data-label="Copy" data-copy="claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp">Copy</button></div>
+              <pre><code><span class="c-cmd">claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp</span></code></pre>
+            </div>
+            <div class="terminal setup-pane" role="tabpanel" data-pane="json" hidden>
+              <div class="terminal-head"><span>add to claude_desktop_config.json / .cursor/mcp.json</span><button class="copy" type="button" data-label="Copy" data-copy='{"mcpServers":{"tennis-evolution":{"command":"uvx","args":["--from","git+https://github.com/bobobo2026/tennis-evolution","tennis-evolution","mcp"]}}}'>Copy</button></div>
+              <pre><code>{
+  "mcpServers": {
+    "tennis-evolution": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/bobobo2026/tennis-evolution",
+               "tennis-evolution", "mcp"]
+    }
+  }
+}</code></pre>
+            </div>
+            <div class="terminal setup-pane" role="tabpanel" data-pane="plugin" hidden>
+              <div class="terminal-head"><span>Claude Code</span><button class="copy" type="button" data-label="Copy" data-copy="/plugin marketplace add bobobo2026/tennis-evolution
+/plugin install tennis-evolution@tennis-evolution">Copy</button></div>
+              <pre><code><span class="c-cmd">/plugin marketplace add bobobo2026/tennis-evolution</span>
+<span class="c-cmd">/plugin install tennis-evolution@tennis-evolution</span></code></pre>
+            </div>
+            <div class="terminal setup-pane" role="tabpanel" data-pane="skill" hidden>
+              <div class="terminal-head"><span>SKILL.md</span><button class="copy" type="button" data-label="Copy" data-copy="git clone https://github.com/bobobo2026/tennis-evolution && cp -r tennis-evolution/skills/tennis-evolution ~/.claude/skills/">Copy</button></div>
+              <pre><code><span class="c-dim"># copy the skill into any agent that loads SKILL.md files</span>
+<span class="c-cmd">git clone https://github.com/bobobo2026/tennis-evolution && cp -r tennis-evolution/skills/tennis-evolution ~/.claude/skills/</span></code></pre>
+            </div>
+            <p class="setup-note mono">tools: probe_video · rank_highlights · start_highlight_reel · get_job · verify_video · license_status · activate_license</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= pricing ================= -->
+    <section class="section pricing" id="pricing">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">08 / Pricing</p>
+            <h2>Free to run. $19 to unlock every rally.</h2>
+          </div>
+          <p class="sec-lede">Rendering always happens on your machine, so there is no subscription to pay for servers. Pro is a one-time licence key that is verified offline.</p>
+        </div>
+
+        <div class="plans">
+          <article class="plan">
+            <h3>Free</h3>
+            <p class="plan-price"><span class="num">$0</span><span class="plan-per">forever</span></p>
+            <ul class="plan-list">
+              <li>Local render, nothing uploaded</li>
+              <li>MCP server, CLI and local web UI</li>
+              <li>Lossless rally clips + self-checks</li>
+              <li>Up to 5 rallies per reel</li>
+              <li>Small “free” watermark on the labeled reel</li>
+            </ul>
+            <a class="btn btn-ghost plan-cta" href="#install">Install free</a>
+          </article>
+
+          <article class="plan plan-pro">
+            <p class="plan-badge mono">Most picked</p>
+            <h3>Pro</h3>
+            <p class="plan-price"><span class="num">$19</span><span class="plan-per">one-time · ¥138</span></p>
+            <ul class="plan-list">
+              <li>Everything in Free</li>
+              <li>Every rally — all 131, not just 5</li>
+              <li>No watermark</li>
+              <li>Offline licence key, all your machines</li>
+              <li>Free updates for the whole 0.x line</li>
+            </ul>
+            <div class="pay">
+              <button class="btn btn-primary pay-btn" type="button" data-pay="creem">Pay with card · Apple Pay · Google Pay</button>
+              <button class="btn btn-ghost pay-btn pay-cn" type="button" data-pay="afdian">微信 / 支付宝 (WeChat · Alipay)</button>
+            </div>
+            <p class="pay-msg" id="pay-msg" role="status" aria-live="polite"></p>
+            <p class="pay-note">Your key appears on the next page right after payment. Card payments are handled by Creem (merchant of record, taxes included); WeChat and Alipay by afdian.</p>
+          </article>
+        </div>
+
+        <div class="claim" data-claim>
+          <label for="claim-input">Paid on afdian and lost the page? Paste the order number:</label>
+          <div class="claim-row">
+            <input id="claim-input" class="mono" inputmode="numeric" autocomplete="off" placeholder="afdian order number">
+            <button class="btn btn-ghost" type="button" id="claim-btn">Get my key</button>
+          </div>
+          <pre class="claim-out mono" id="claim-out" hidden></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= why local ================= -->
+    <section class="section local" id="local">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">09 / Privacy</p>
+            <h2>The footage never leaves the machine.</h2>
+          </div>
+          <p class="sec-lede">A full match contains your friends, your club and your mistakes. Local-first is not a slogan here: there is no server to send it to, and no queue to wait in.</p>
+        </div>
+
+        <div class="pills">
+          <p class="pill">Your footage stays on disk</p>
+          <p class="pill">No account, no queue</p>
+          <p class="pill">Free version, MIT source</p>
+          <p class="pill">Works on HDR iPhone video</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= faq ================= -->
+    <section class="section" id="faq">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">10 / FAQ</p>
+            <h2>Questions that keep coming up.</h2>
+          </div>
+          <p class="sec-lede">Short answers below. The longer reasoning, including the ffmpeg arguments and the failures that shaped them, is in the repository.</p>
+        </div>
+
+        <div class="faq">
+          <details class="faq-item" id="faq-detector">
+            <summary>
+              <span class="faq-q">Do I need a hit detector?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>No. Bring any list of time ranges: sliceapp's export, your own detector, or a text file you typed by hand. Detection is deliberately out of scope, because a hit counter tuned to one venue's reverb makes the whole pipeline brittle. If you already export ranges from sliceapp, this doubles as a slice app alternative: the export drops straight in.</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-hdr">
+            <summary>
+              <span class="faq-q">Does it work with iPhone HDR video?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>Yes. iPhone tennis video highlights keep their HLG tags, 10-bit colour and rotation metadata: the lossless cuts are untouched, and the reel comes out as an HDR HEVC tennis video at the same 10-bit depth. Dolby Vision's dynamic metadata cannot be written back by x265 and is dropped on re-encode; the HDR10/HLG base layer stays intact.</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-platform">
+            <summary>
+              <span class="faq-q">Is it macOS only?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>The CLI runs on macOS and Linux with ffmpeg on PATH and Python 3.11 or newer. A packaged Mac app is on the roadmap; star the repository to follow it.</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-try">
+            <summary>
+              <span class="faq-q">Can I try it without installing?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>Every clip on this page is pre-rendered, so you can judge the output first. There is no online renderer on purpose: generating one means uploading an hour of your footage to someone else's server.</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-time">
+            <summary>
+              <span class="faq-q">How long does it take?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>A 47-minute source with five rallies takes about 3 to 5 minutes end to end on an M-series Mac, almost all of it the single x265 encode. The local web UI shows live progress for each stage.</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-cost">
+            <summary>
+              <span class="faq-q">What does it cost?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>The free version costs nothing: local rendering, the MCP server and every self-check, up to five rallies per reel with a small watermark. Pro is a one-time $19 (¥138) licence key that unlocks every rally and removes the watermark. Pay by card, Apple Pay, Google Pay, WeChat or Alipay; the key is verified offline, so nothing ever phones home.</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-agent">
+            <summary>
+              <span class="faq-q">Can ChatGPT, Claude or Cursor make a tennis highlight video for me?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>Yes, through MCP. Add the Tennis Evolution MCP server (one line for Claude Code, a JSON snippet for Claude Desktop, Cursor, Codex or Windsurf) and ask in plain words, for example “cut the five longest rallies from match.MOV and label them with my club name”. The agent calls probe_video, rank_highlights, start_highlight_reel and get_job, and reports the self-check result. Rendering still runs on your own computer.</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-pro">
+            <summary>
+              <span class="faq-q">What does Pro add, and is it a subscription?</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>No subscription. Pro is a single $19 payment for an offline licence key: every rally instead of five, no watermark, use it on all your machines, free updates for the 0.x line. Activate it with “tennis-evolution license activate KEY” or ask your agent to call activate_license.</p></div>
+          </details>
+        </div>
+
+        <p class="faq-more">Something else? <a href="https://github.com/bobobo2026/tennis-evolution/issues" rel="noopener">Open an issue on GitHub ↗</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <a class="brand" href="/" aria-label="Tennis Evolution home">
+            <span class="brand-ball" aria-hidden="true"></span>
+            <span>Tennis Evolution</span>
+          </a>
+          <p>Cut tennis rallies out of a long recording, label them with the numbers that matter, and hand back a verified reel — an open source tennis video editor that runs on your machine, without uploading a frame.</p>
+          <p class="foot-note">Demo footage is CC0 stock processed by this tool. No real venue footage or identifiable people are published here.</p>
+        </div>
+        <nav class="foot-col" aria-label="Sections">
+          <p class="foot-h">Sections</p>
+          <a href="#demo">Demo</a>
+          <a href="#how">How it works</a>
+          <a href="#install">Install</a>
+          <a href="#agents">AI agents (MCP)</a>
+          <a href="#pricing">Pricing</a>
+          <a href="/guides/">Guides</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+        <nav class="foot-col" aria-label="Project">
+          <p class="foot-h">Project</p>
+          <a href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub ↗</a>
+          <a href="https://github.com/bobobo2026/tennis-evolution#readme" rel="noopener">README</a>
+          <a href="https://opensource.org/licenses/MIT" rel="noopener">MIT license</a>
+        </nav>
+        <nav class="foot-col" aria-label="Language">
+          <p class="foot-h">Language</p>
+          <a href="/" aria-current="page">English</a>
+          <a href="/zh/" hreflang="zh-CN" lang="zh-CN">中文</a>
+        </nav>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 Tennis Evolution</span>
+        <span class="mono">MIT licensed · built with ffmpeg + Pillow · no telemetry</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

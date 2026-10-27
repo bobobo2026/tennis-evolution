@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>网球进化 · 长录像自动剪成带角标的网球精彩集锦（本地运行 · 开源 MIT）</title>
+  <meta name="description" content="把很长的网球录像剪成精彩回合集锦，把拍数、地点、钟点和片源时间点烧进画面，交付前逐项自检。本地运行、素材不出本机、MIT 开源。">
+  <link rel="canonical" href="https://tennis-evolution.pages.dev/zh/">
+  <link rel="alternate" hreflang="en" href="https://tennis-evolution.pages.dev/">
+  <link rel="alternate" hreflang="zh-CN" href="https://tennis-evolution.pages.dev/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://tennis-evolution.pages.dev/">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#0A0F0C">
+  <meta name="color-scheme" content="dark">
+  <meta name="author" content="Tennis Evolution">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="网球进化 Tennis Evolution">
+  <meta property="og:title" content="47 分钟的网球录像进去，3 分 49 秒的角标集锦出来。">
+  <meta property="og:description" content="把很长的网球录像剪成精彩回合集锦，把拍数、地点、钟点和片源时间点烧进画面，交付前逐项自检。本地运行、素材不出本机、MIT 开源。">
+  <meta property="og:url" content="https://tennis-evolution.pages.dev/zh/">
+  <meta property="og:image" content="https://tennis-evolution.pages.dev/assets/og.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="网球进化：47:29 的源片，变成一条把拍数、地点、钟点烧进画面的 3:49 角标集锦。">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="47 分钟的网球录像进去，3 分 49 秒的角标集锦出来。">
+  <meta name="twitter:description" content="把很长的网球录像剪成精彩回合集锦，把拍数、地点、钟点和片源时间点烧进画面，交付前逐项自检。本地运行、素材不出本机、MIT 开源。">
+  <meta name="twitter:image" content="https://tennis-evolution.pages.dev/assets/og.jpg">
+  <meta name="twitter:image:alt" content="网球进化：47:29 的源片，变成一条把拍数、地点、钟点烧进画面的 3:49 角标集锦。">
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://tennis-evolution.pages.dev/zh/#software",
+        "name": "网球进化",
+        "alternateName": [
+          "Tennis Evolution",
+          "tennis-evolution"
+        ],
+        "description": "本机运行的工具：把很长的网球录像剪成精彩回合集锦——关键帧无损切片、一次成型拼接、把拍数/地点/钟点/片源时间点烧进画面，并把逐项自检结果写进 manifest.json。",
+        "url": "https://tennis-evolution.pages.dev/zh/",
+        "applicationCategory": "MultimediaApplication",
+        "applicationSubCategory": "视频剪辑",
+        "operatingSystem": "macOS, Linux",
+        "softwareRequirements": "Python 3.11 以上，且 ffmpeg、ffprobe 在 PATH 中。",
+        "softwareVersion": "0.2.0",
+        "inLanguage": "zh-CN",
+        "license": "https://opensource.org/licenses/MIT",
+        "isAccessibleForFree": true,
+        "codeRepository": "https://github.com/bobobo2026/tennis-evolution",
+        "downloadUrl": "https://github.com/bobobo2026/tennis-evolution",
+        "screenshot": "https://tennis-evolution.pages.dev/assets/og.jpg",
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "免费版",
+            "price": "0",
+            "priceCurrency": "CNY",
+            "availability": "https://schema.org/InStock"
+          },
+          {
+            "@type": "Offer",
+            "name": "Pro 许可证（一次性）",
+            "price": "138",
+            "priceCurrency": "CNY",
+            "url": "https://tennis-evolution.pages.dev/zh/#pricing",
+            "availability": "https://schema.org/InStock"
+          }
+        ],
+        "featureList": [
+          "关键帧对齐的无损流拷贝切片，保留 HDR、10 位色深与旋转元数据",
+          "一次成型拼接（trim → concat → 单次编码），拒绝 concat demuxer 流拷贝",
+          "把拍数、地点、钟点、片源时间点作为 PNG 图层烧进画面",
+          "每个产物逐项自检，结果写进机器可读的 manifest.json",
+          "MCP server：AI Agent（Claude、Cursor、Codex）可以直接帮你出片"
+        ],
+        "keywords": "网球精彩集锦, 网球录像剪辑, 网球回合切片, 网球高光视频, slice app 替代, iPhone 网球视频, HDR HEVC 网球视频, 开源网球视频工具"
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://tennis-evolution.pages.dev/zh/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "我需要自己做击球检测吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "不需要。任何能给出时间区间的列表都能直接用：sliceapp 导出的文本、你自己的检测器，或者手敲的一份 txt。检测刻意放在流程之外——一个只为某间球馆混响调过参的击球计数器，会让整条流水线变脆。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "支持 iPhone 拍的 HDR 视频吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "支持。无损切片会原样保留 HLG、10 位色深和旋转元数据，合集也保留 HLG 色彩标签和 10 位深度。Dolby Vision 的动态元数据 x265 写不回去，重编码时会丢；HDR10/HLG 基础层完好。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "只能在 macOS 上用吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "CLI 在 macOS 和 Linux 上都能跑，需要 ffmpeg 在 PATH 里、Python 3.11 以上。打包好的 Mac 应用在计划中，可以先去 GitHub 点个 Star。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "不安装能先看效果吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "这个页面上所有片段都是预渲染的，可以先看再决定。刻意不做在线生成：那意味着要把你一小时的录像传到别人的服务器上。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "跑一次要多久？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "47 分钟源片、5 个回合，在 M 系列 Mac 上大约 3 到 5 分钟，绝大部分时间花在那一次 x265 编码上。本机网页版会显示每个阶段的实时进度。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "收费吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "免费版不收钱：本机渲染、MCP server、全部自检都能用，每条合集最多 5 段、带一个小水印。Pro 是一次性 ¥138（$19）的许可证，解锁全部回合、去掉水印。支持微信、支付宝、银行卡、Apple Pay、Google Pay；许可证离线校验，不联网、不上报。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "能让 ChatGPT / Claude / Cursor 帮我剪网球集锦吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "能，通过 MCP。接入网球进化的 MCP server（Claude Code 一行命令，Claude Desktop、Cursor、Codex、Windsurf 贴一段 JSON），然后直接说「把 match.MOV 里最长的五个回合剪出来，角标写我们球馆的名字」。Agent 会依次调用 probe_video、rank_highlights、start_highlight_reel、get_job，并把自检结果告诉你。渲染仍然在你自己的电脑上。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Pro 多了什么？是订阅吗？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "不是订阅。Pro 是一次性 ¥138 的离线许可证：所有回合（不止 5 段）、无水印、你的每台电脑都能用、0.x 版本内免费升级。用 tennis-evolution license activate KEY 激活，或让 Agent 调用 activate_license。"
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body class="lang-zh">
+  <a class="skip" href="#main">跳到正文</a>
+
+  <header class="site-head">
+    <div class="wrap head-inner">
+      <a class="brand" href="/zh/" aria-label="网球进化首页">
+        <span class="brand-ball" aria-hidden="true"></span>
+        <span>网球进化</span>
+        <span class="brand-sub">开源 · v0.2</span>
+      </a>
+      <nav class="nav" aria-label="主导航">
+        <a href="#lab">试一试</a>
+        <a href="#labels">前后对比</a>
+        <a href="#demo">成片</a>
+        <a href="#how">工作原理</a>
+        <a href="#agents">Agent</a>
+        <a href="#pricing">价格</a>
+        <a href="#faq">常见问题</a>
+      </nav>
+      <div class="head-actions">
+        <a class="head-btn lang" href="/" hreflang="en" lang="en" aria-label="切换到英文版">EN</a>
+        <a class="head-btn" href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ================= hero ================= -->
+    <section class="hero">
+      <div class="wrap">
+        <p class="eyebrow">开源 · 在你自己的 Mac 上跑 · 支持 AI Agent 直接调用</p>
+
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1><span class="hl">47 分钟</span>的网球录像，<br><span class="hl">3 分 49 秒</span>的角标集锦。</h1>
+            <p class="lede">网球进化会把一段很长的手机录像里每个回合单独剪出来，把拍数、地点、拍摄钟点和片源时间点烧进画面，交付前逐项自检。素材全程留在你自己的机器上——不上传、不注册、不经过任何云。</p>
+            <div class="cta-row">
+              <a class="btn btn-primary" href="#demo">看一条真实成片 <span class="arrow" aria-hidden="true">↓</span></a>
+              <a class="btn btn-ghost" href="#install">一行命令安装</a>
+            </div>
+          </div>
+
+          <aside class="hero-facts" aria-label="这次真实运行的关键数字">
+            <p class="facts-label">这次真实运行</p>
+            <dl class="facts">
+              <div>
+                <dt>源片 → 成片</dt>
+                <dd><span class="num">47:29</span><span class="arrow" aria-hidden="true">→</span><span class="num lime">3:49</span></dd>
+              </div>
+              <div>
+                <dt>保留的最长回合</dt>
+                <dd>5<span class="unit">个</span></dd>
+              </div>
+              <div>
+                <dt>单回合最多拍数</dt>
+                <dd>40<span class="unit">拍</span></dd>
+              </div>
+              <div>
+                <dt>每个文件的自检</dt>
+                <dd>9<span class="pass">PASS</span></dd>
+              </div>
+            </dl>
+            <p class="facts-note">一次手持 iPhone 拍摄：1080×1920，HEVC 10 位 HLG，47 分钟，没有第二机位。</p>
+          </aside>
+        </div>
+
+        <!-- 源片 → 成片示意，纯 CSS 画，不产生任何请求 -->
+        <figure class="record">
+          <figcaption class="visually-hidden">这次真实运行：47 分 29 秒的 iPhone 源片进去，从 5 个最长回合拼出一条 3 分 49 秒的成片出来。</figcaption>
+          <p class="record-k mono" aria-hidden="true">
+            <span>源片</span>
+            <span><b>47:29.2</b> · iPhone HEVC 10 位 HLG · 1080×1920</span>
+          </p>
+          <div class="track track-src" aria-hidden="true">
+            <span class="rs rs1" data-t="2:15"></span>
+            <span class="rs rs2" data-t="14:50"></span>
+            <span class="rs rs3" data-t="27:14"></span>
+            <span class="rs rs4" data-t="34:28"></span>
+            <span class="rs rs5" data-t="38:49"></span>
+          </div>
+          <p class="record-join mono" aria-hidden="true">切在关键帧 · 一次编码成型</p>
+          <div class="track track-reel" aria-hidden="true">
+            <span>40</span><span>36</span><span>27</span><span>24</span><span>24</span>
+          </div>
+          <p class="record-k record-k-end mono" aria-hidden="true">
+            <span>成片</span>
+            <span><b>3:49</b> · 5 段 · 方块里是拍数</span>
+          </p>
+        </figure>
+      </div>
+    </section>
+
+
+    <!-- ================= rally lab ================= -->
+    <section class="section lab" id="lab">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">01 / 试一试</p>
+            <h2>拖一下滑块，看合集自己拼出来。</h2>
+          </div>
+          <p class="sec-lede">这就是那段参考录像：47 分钟、131 个回合。选保留几段、怎么排序，时间轴、合集和角标都会按工具真正的切法实时变化。</p>
+        </div>
+
+        <div class="lab-panel" data-lab data-place="滨江网球俱乐部" data-unit="拍" data-src="片源">
+          <div class="lab-controls">
+            <label class="lab-keep" for="lab-range">保留最好的 <output id="lab-n" class="num">5</output> 个回合</label>
+            <div class="lab-range-wrap">
+              <input type="range" id="lab-range" min="1" max="20" value="5" step="1">
+              <div class="lab-tiers mono" aria-hidden="true"><span>免费 · 最多 5 段</span><span>Pro · 全部 131 段</span></div>
+            </div>
+            <div class="seg lab-sort" role="group">
+              <button class="seg-btn" type="button" data-sort="hits" aria-pressed="true">拍数优先</button>
+              <button class="seg-btn" type="button" data-sort="start" aria-pressed="false">按时间顺序</button>
+            </div>
+          </div>
+
+          <div class="lab-timeline" aria-hidden="true">
+            <div class="lab-ticks" id="lab-ticks"></div>
+            <div class="lab-axis mono"><span>0:00</span><span>15:00</span><span>30:00</span><span>47:29</span></div>
+          </div>
+
+          <dl class="lab-stats">
+            <div><dt>合集时长</dt><dd class="num" id="lab-len">3:49</dd></div>
+            <div><dt>回合数</dt><dd class="num"><span id="lab-count">5</span><span class="unit">/ 131</span></dd></div>
+            <div><dt>画面上的总拍数</dt><dd class="num" id="lab-hits">151</dd></div>
+          </dl>
+
+          <div class="lab-body">
+            <ol class="lab-strip" id="lab-strip"></ol>
+            <figure class="lab-preview" aria-live="polite">
+              <figcaption class="mono">角标预览 · 把鼠标移到回合上</figcaption>
+              <div class="lab-screen">
+                <div class="lab-card">
+                  <b id="lp-place">滨江网球俱乐部</b>
+                  <span id="lp-clock">2026-10-24 17:44</span>
+                  <small id="lp-src">片源 27:14</small>
+                </div>
+                <div class="lab-badge"><b id="lp-hits">40</b><span>拍</span></div>
+                <div class="lab-court" aria-hidden="true"></div>
+              </div>
+            </figure>
+          </div>
+
+          <div class="lab-pro" id="lab-pro" hidden>
+            <p>超过 5 段属于 Pro 功能：一次付费，所有回合、无水印。</p>
+            <a class="btn btn-primary" href="#pricing">解锁 Pro · ¥138 <span class="arrow" aria-hidden="true">→</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 前后对比 ================= -->
+    <section class="section" id="labels">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">02 / 角标</p>
+            <h2>同样的素材，说话的是角标。</h2>
+          </div>
+          <p class="sec-lede">每一段片段都带着这一回合的拍数、球馆、钟点，以及它在源片里的位置——所以哪怕脱离了上下文，一段片段依然说得清楚。</p>
+        </div>
+
+        <div class="compare-bar">
+          <div class="seg" role="group" aria-label="角标开关">
+            <button class="seg-btn" type="button" data-mode="plain" aria-pressed="false">不带角标</button>
+            <button class="seg-btn" type="button" data-mode="labeled" aria-pressed="true">带角标</button>
+          </div>
+          <p class="compare-file mono"><span class="dot" aria-hidden="true"></span><span data-file-name>demo-reel.mp4</span></p>
+        </div>
+
+        <div class="media-frame media-16x9" data-media>
+          <video id="compare-video" controls playsinline preload="metadata" width="1280" height="720"
+                 poster="/assets/demo-reel.jpg" src="/assets/demo-reel.mp4"
+                 data-mode="labeled"
+                 data-src-labeled="/assets/demo-reel.mp4" data-src-plain="/assets/demo-plain.mp4"
+                 data-poster-labeled="/assets/demo-reel.jpg" data-poster-plain="/assets/demo-plain.jpg"
+                 aria-label="带角标的示例回合。用上面的按钮可以切到同一段素材不带角标的版本。"></video>
+        </div>
+
+        <p class="compare-note">
+          切换时会保留播放位置，你能看到同一帧带角标和不带角标的样子。
+          <span>PNG 叠加 · Pillow</span>
+        </p>
+        <noscript><p class="compare-note">角标切换需要 JavaScript。上面的视频仍然能播，默认带角标。</p></noscript>
+      </div>
+    </section>
+
+    <!-- ================= 成片 ================= -->
+    <section class="section" id="demo">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">03 / 成片</p>
+            <h2>先看成片，再拿自己的录像跑一遍。</h2>
+          </div>
+          <p class="sec-lede">这里的每一段视频都是工具的真实输出，不是效果图。hero 上的数字来自一次 47 分钟的手机录像；下面播放器里是一段更短的 CC0 素材，走的是同一条流水线。</p>
+        </div>
+
+        <div class="media-frame media-16x9 player" data-media id="demo-player">
+          <video id="reel" controls playsinline preload="metadata" width="1280" height="720"
+                 poster="/assets/demo-reel.jpg" src="/assets/demo-reel.mp4"
+                 aria-label="带烧录角标的示例集锦"></video>
+          <div class="player-cover">
+            <button class="player-cover-btn" type="button" aria-label="播放示例集锦，时长 1 分 39 秒">
+              <span class="player-ring" aria-hidden="true"></span>
+              <span>播放成片</span>
+              <span class="player-meta mono"><strong>1:39</strong> · 1280×720</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="demo-meta mono">reel_labeled.mp4 · h.264 · 1280×720 · 1:39 · 角标已烧录</p>
+        <p class="demo-sample mono">示例素材：CC0 片段，走的是同一条流水线——源片 2:16，四个回合，成片 1:39。</p>
+
+        <div class="clips">
+          <article class="clip">
+            <div class="media-frame media-16x9" data-media>
+              <video controls playsinline preload="metadata" width="1280" height="720"
+                     poster="/assets/clip-01.jpg" src="/assets/clip-01.mp4"
+                     aria-label="示例集锦里的第 1 条无损片段"></video>
+            </div>
+            <div class="clip-meta">
+              <p class="clip-k mono">无损片段 · 01<span class="clip-dur">0:28</span></p>
+              <p class="clip-hits">clip-01<span>.mp4</span></p>
+              <p class="clip-src">逐位流拷贝，角标已烧进画面。</p>
+            </div>
+          </article>
+          <article class="clip">
+            <div class="media-frame media-16x9" data-media>
+              <video controls playsinline preload="metadata" width="1280" height="720"
+                     poster="/assets/clip-02.jpg" src="/assets/clip-02.mp4"
+                     aria-label="示例集锦里的第 2 条无损片段"></video>
+            </div>
+            <div class="clip-meta">
+              <p class="clip-k mono">无损片段 · 02<span class="clip-dur">0:19</span></p>
+              <p class="clip-hits">clip-02<span>.mp4</span></p>
+              <p class="clip-src">切在关键帧上，尾部不会丢参考帧。</p>
+            </div>
+          </article>
+          <article class="clip">
+            <div class="media-frame media-16x9" data-media>
+              <video controls playsinline preload="metadata" width="1280" height="720"
+                     poster="/assets/clip-03.jpg" src="/assets/clip-03.mp4"
+                     aria-label="示例集锦里的第 3 条无损片段"></video>
+            </div>
+            <div class="clip-meta">
+              <p class="clip-k mono">无损片段 · 03<span class="clip-dur">0:23</span></p>
+              <p class="clip-hits">clip-03<span>.mp4</span></p>
+              <p class="clip-src">不重编码，也就没有代际损失。</p>
+            </div>
+          </article>
+        </div>
+
+        <p class="demo-note">这些是无损流拷贝——切在关键帧上，没有重编码。示例素材本身是 SDR；换成真实 iPhone HDR 录像时，10 位 HLG 画面和旋转元数据会原样保留。</p>
+      </div>
+    </section>
+
+    <!-- ================= paper spread ================= -->
+    <div class="paper">
+      <section class="section" id="how">
+        <div class="wrap">
+          <div class="sec-head">
+            <div>
+              <p class="sec-index mono">04 / 流水线</p>
+              <h2>四步，其中一步是「拒绝走捷径」。</h2>
+            </div>
+            <p class="sec-lede">有意思的决定都在边缘上：一刀允许切在哪里、几段怎么拼起来、什么才算真的做完。</p>
+          </div>
+
+          <ol class="steps">
+            <li class="step">
+              <span class="step-n mono" aria-hidden="true">01</span>
+              <div class="step-body">
+                <h3>拿来一份高光列表</h3>
+                <p>任何能给出时间区间的工具都能用：sliceapp 导出的文本、你自己的检测器，或者手敲的一份 txt。检测刻意放在流程之外。</p>
+              </div>
+              <span class="step-tag">txt · json</span>
+            </li>
+            <li class="step">
+              <span class="step-n mono" aria-hidden="true">02</span>
+              <div class="step-body">
+                <h3>切在关键帧上，而不是毫秒上</h3>
+                <p>流拷贝是逐位精确的，HDR、10 位色深和旋转元数据都能留住；切点会对齐到最近的关键帧，所以整条流水线从不为了「更准」去重编码片段。</p>
+              </div>
+              <span class="step-tag">-c copy</span>
+            </li>
+            <li class="step">
+              <span class="step-n mono" aria-hidden="true">03</span>
+              <div class="step-body">
+                <h3>一次成型地拼接</h3>
+                <p>回合先 trim 再 concat，合成一次编码。最顺手的那种 concat demuxer 写法实测会留下 1.01 秒的永久音画偏移和 HEVC 坏参考帧，所以这个工具拒绝它，并把问题报出来。</p>
+              </div>
+              <span class="step-tag">trim → concat</span>
+            </li>
+            <li class="step">
+              <span class="step-n mono" aria-hidden="true">04</span>
+              <div class="step-body">
+                <h3>自检通过才算交付</h3>
+                <p>每个产物都要检查：解码零错误、起始偏移为零、音画时长一致、首尾不是黑帧、音频不是静音。任一项失败，命令就以非零退出码结束。</p>
+              </div>
+              <span class="step-tag">manifest.json</span>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="section" id="outputs">
+        <div class="wrap">
+          <div class="sec-head">
+            <div>
+              <p class="sec-index mono">05 / 产物</p>
+              <h2>你会拿到什么。</h2>
+            </div>
+            <p class="sec-lede">一次运行一个目录。没有藏起来的工程文件：成片、片段、角标图层和报告就摆在一起。</p>
+          </div>
+
+          <div class="out-grid">
+            <div>
+              <ul class="files">
+                <li><code>reel_labeled.mp4</code><span>带角标的成片——你要上传的就是这个。</span></li>
+                <li><code>reel_plain.mp4</code><span>同一版拼装，画面干净，留给你自己加字幕。</span></li>
+                <li><code>clips/</code><span>一个回合一条无损切片，原始 HDR，方向已烧进画面。</span></li>
+                <li><code>labels/*.png</code><span>透明角标图层，任何剪辑软件里都能复用。</span></li>
+                <li><code>highlights.normalized.json</code><span>这次实际用到的片段清单。</span></li>
+                <li><code>manifest.json</code><span>全部参数和每一项自检结果。</span></li>
+              </ul>
+              <blockquote class="manifest-quote">
+                manifest 就是契约：每个参数、每一项自检结果，机器可读。
+                <em>非零退出码代表自检失败——脚本和 Agent 不用把视频看完，也能相信这次运行。</em>
+              </blockquote>
+              <div class="checks" aria-label="每个产物都会跑的自检项">
+                <span>解码零错误</span>
+                <span>起始偏移</span>
+                <span>音画时长一致</span>
+                <span>预期时长</span>
+                <span>首尾非黑帧</span>
+                <span>音频非静音</span>
+              </div>
+            </div>
+
+            <div class="anatomy">
+              <p class="anatomy-cap mono">角标放大看</p>
+              <div class="label-shot" data-media>
+                <img src="/assets/frame-label.jpg" width="1600" height="900" loading="lazy" decoding="async"
+                     alt="网球回合画面上放大的角标：拍数、球馆、钟点，以及这一回合在源片里的时间点。">
+              </div>
+              <dl class="anatomy-list">
+                <div>
+                  <dt>拍数</dt>
+                  <dd><b>14</b>这一回合的击球数，也是排序依据。</dd>
+                </div>
+                <div>
+                  <dt>地点</dt>
+                  <dd>用 <code>--place</code> 传进去的值——这段示例里是 Riverside Tennis Club。</dd>
+                </div>
+                <div>
+                  <dt>钟点</dt>
+                  <dd>录制开始时间加回合偏移，时区由你指定。</dd>
+                </div>
+                <div>
+                  <dt>片源</dt>
+                  <dd><b>0:02</b>这段回合在原文件里的位置。</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="install">
+        <div class="wrap">
+          <div class="sec-head">
+            <div>
+              <p class="sec-index mono">06 / 安装</p>
+              <h2>一行命令安装。</h2>
+            </div>
+            <p class="sec-lede">还没发布到 PyPI，直接从仓库装。ffmpeg 要自己在 PATH 里——工具不会偷偷替你打包 40 MB 的 ffmpeg。</p>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-head">
+              <span>终端 — <b>安装 + 运行</b></span>
+              <button class="copy" type="button" data-label="复制"
+                      data-copy="pipx install git+https://github.com/bobobo2026/tennis-evolution"
+                      aria-label="把安装命令复制到剪贴板">复制</button>
+            </div>
+            <pre><code><span class="c-dim"># 先装 ffmpeg：brew install ffmpeg  ·  sudo apt install ffmpeg fonts-noto-cjk</span>
+<span class="c-cmd">pipx install git+https://github.com/bobobo2026/tennis-evolution</span>
+
+<span class="c-dim"># 高光列表可以来自 sliceapp、你自己的检测器，或者手敲</span>
+<span class="c-cmd">tennis-evolution all IMG_5155.MOV --highlights highlights.txt --top 5 --place "你的球馆" --timezone Asia/Shanghai --outdir out</span></code></pre>
+          </div>
+          <p class="install-note">需要 Python 3.11 以上和 ffmpeg/ffprobe，macOS 与 Linux 均可。源码、issue 和完整的流水线笔记在 <a href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub</a>。</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= agents ================= -->
+    <section class="section agents" id="agents">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">07 / Agent</p>
+            <h2>或者，直接交给你的 Agent。</h2>
+          </div>
+          <p class="sec-lede">网球进化自带 MCP server、Claude Code 插件和通用 Skill。任何支持 MCP 的 Agent（Claude、Cursor、Codex、Windsurf……）都能读素材、排回合、出合集、看自检结果。免费版在所有 Agent 里都能用。</p>
+        </div>
+
+        <div class="agents-grid">
+          <div class="chat" data-chat aria-label="Example agent session">
+            <p class="chat-row chat-you">把 ~/Movies/match.MOV 里最长的五个回合剪出来，角标地点写「滨江网球俱乐部」。</p>
+            <p class="chat-row chat-tool"><code>probe_video</code><span>47:29 · HEVC 10-bit HLG · 竖屏 1080×1920</span></p>
+            <p class="chat-row chat-tool"><code>rank_highlights</code><span>131 个回合 · 保留 40、36、27、24、24 拍</span></p>
+            <p class="chat-row chat-tool"><code>start_highlight_reel</code><span>任务 3f9c21 · 后台渲染中</span></p>
+            <p class="chat-row chat-tool chat-pass"><code>get_job</code><span>完成 · 自检 PASS · reel_labeled.mp4（3:49）</span></p>
+            <p class="chat-row chat-agent">好了。合集在 ~/Movies/out/reel_labeled.mp4：5 个回合、3 分 49 秒，自检全部通过。</p>
+          </div>
+
+          <div class="setup" data-tabs>
+            <div class="setup-tabs" role="tablist">
+              <button type="button" role="tab" aria-selected="true" data-tab="code">Claude Code</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="json">Claude Desktop · Cursor</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="plugin">插件</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="skill">任意 Agent</button>
+            </div>
+            <div class="terminal setup-pane" role="tabpanel" data-pane="code">
+              <div class="terminal-head"><span>Terminal</span><button class="copy" type="button" data-label="复制" data-copy="claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp">复制</button></div>
+              <pre><code><span class="c-cmd">claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp</span></code></pre>
+            </div>
+            <div class="terminal setup-pane" role="tabpanel" data-pane="json" hidden>
+              <div class="terminal-head"><span>写进 claude_desktop_config.json / .cursor/mcp.json</span><button class="copy" type="button" data-label="复制" data-copy='{"mcpServers":{"tennis-evolution":{"command":"uvx","args":["--from","git+https://github.com/bobobo2026/tennis-evolution","tennis-evolution","mcp"]}}}'>复制</button></div>
+              <pre><code>{
+  "mcpServers": {
+    "tennis-evolution": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/bobobo2026/tennis-evolution",
+               "tennis-evolution", "mcp"]
+    }
+  }
+}</code></pre>
+            </div>
+            <div class="terminal setup-pane" role="tabpanel" data-pane="plugin" hidden>
+              <div class="terminal-head"><span>Claude Code</span><button class="copy" type="button" data-label="复制" data-copy="/plugin marketplace add bobobo2026/tennis-evolution
+/plugin install tennis-evolution@tennis-evolution">复制</button></div>
+              <pre><code><span class="c-cmd">/plugin marketplace add bobobo2026/tennis-evolution</span>
+<span class="c-cmd">/plugin install tennis-evolution@tennis-evolution</span></code></pre>
+            </div>
+            <div class="terminal setup-pane" role="tabpanel" data-pane="skill" hidden>
+              <div class="terminal-head"><span>SKILL.md</span><button class="copy" type="button" data-label="复制" data-copy="git clone https://github.com/bobobo2026/tennis-evolution && cp -r tennis-evolution/skills/tennis-evolution ~/.claude/skills/">复制</button></div>
+              <pre><code><span class="c-dim"># 把 skill 复制到任何会加载 SKILL.md 的 Agent</span>
+<span class="c-cmd">git clone https://github.com/bobobo2026/tennis-evolution && cp -r tennis-evolution/skills/tennis-evolution ~/.claude/skills/</span></code></pre>
+            </div>
+            <p class="setup-note mono">tools: probe_video · rank_highlights · start_highlight_reel · get_job · verify_video · license_status · activate_license</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= pricing ================= -->
+    <section class="section pricing" id="pricing">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">08 / 价格</p>
+            <h2>免费就能用，¥138 解锁全部回合。</h2>
+          </div>
+          <p class="sec-lede">渲染永远在你自己的电脑上，没有服务器成本，所以不搞订阅。Pro 是一次性的许可证，离线校验。</p>
+        </div>
+
+        <div class="plans">
+          <article class="plan">
+            <h3>免费版</h3>
+            <p class="plan-price"><span class="num">¥0</span><span class="plan-per">永久</span></p>
+            <ul class="plan-list">
+              <li>本机渲染，素材不上传</li>
+              <li>MCP server、命令行、本机网页版</li>
+              <li>无损回合片段 + 自检</li>
+              <li>每条合集最多 5 段</li>
+              <li>角标合集右下角有「free」小水印</li>
+            </ul>
+            <a class="btn btn-ghost plan-cta" href="#install">免费安装</a>
+          </article>
+
+          <article class="plan plan-pro">
+            <p class="plan-badge mono">最多人选</p>
+            <h3>Pro</h3>
+            <p class="plan-price"><span class="num">¥138</span><span class="plan-per">一次性 · $19</span></p>
+            <ul class="plan-list">
+              <li>免费版的全部能力</li>
+              <li>所有回合，131 段全都能要</li>
+              <li>去掉水印</li>
+              <li>离线许可证，你的每台电脑都能用</li>
+              <li>0.x 版本内免费升级</li>
+            </ul>
+            <div class="pay">
+              <button class="btn btn-primary pay-btn" type="button" data-pay="creem">银行卡 · Apple Pay · Google Pay</button>
+              <button class="btn btn-ghost pay-btn pay-cn" type="button" data-pay="afdian">微信 / 支付宝</button>
+            </div>
+            <p class="pay-msg" id="pay-msg" role="status" aria-live="polite"></p>
+            <p class="pay-note">付款成功后，下一页立刻显示许可证。海外卡支付由 Creem 处理（含税），微信 / 支付宝由爱发电处理。</p>
+          </article>
+        </div>
+
+        <div class="claim" data-claim>
+          <label for="claim-input">在爱发电付过款、页面关掉了？贴订单号找回：</label>
+          <div class="claim-row">
+            <input id="claim-input" class="mono" inputmode="numeric" autocomplete="off" placeholder="爱发电订单号">
+            <button class="btn btn-ghost" type="button" id="claim-btn">找回许可证</button>
+          </div>
+          <pre class="claim-out mono" id="claim-out" hidden></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 为什么本地 ================= -->
+    <section class="section local" id="local">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">09 / 隐私</p>
+            <h2>素材永远不出本机。</h2>
+          </div>
+          <p class="sec-lede">一场完整比赛里有你的朋友、你的球馆和你的失误。本地优先不是口号：这里根本没有能接收素材的服务器，也没有队列要排。</p>
+        </div>
+
+        <div class="pills">
+          <p class="pill">素材只留在你的硬盘上</p>
+          <p class="pill">不用账号，不用排队</p>
+          <p class="pill">免费版可用，源码 MIT 开源</p>
+          <p class="pill">支持 iPhone HDR 视频</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FAQ ================= -->
+    <section class="section" id="faq">
+      <div class="wrap">
+        <div class="sec-head">
+          <div>
+            <p class="sec-index mono">10 / 常见问题</p>
+            <h2>经常被问到的几个问题。</h2>
+          </div>
+          <p class="sec-lede">下面是短答案。更长的推理——包括具体的 ffmpeg 参数和踩过的坑——都在仓库里。</p>
+        </div>
+
+        <div class="faq">
+          <details class="faq-item" id="faq-detector">
+            <summary>
+              <span class="faq-q">我需要自己做击球检测吗？</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>不需要。任何能给出时间区间的列表都能直接用：sliceapp 导出的文本、你自己的检测器，或者手敲的一份 txt。检测刻意放在流程之外——一个只为某间球馆混响调过参的击球计数器，会让整条流水线变脆。</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-hdr">
+            <summary>
+              <span class="faq-q">支持 iPhone 拍的 HDR 视频吗？</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>支持。无损切片会原样保留 HLG、10 位色深和旋转元数据，合集也保留 HLG 色彩标签和 10 位深度。Dolby Vision 的动态元数据 x265 写不回去，重编码时会丢；HDR10/HLG 基础层完好。</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-platform">
+            <summary>
+              <span class="faq-q">只能在 macOS 上用吗？</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>CLI 在 macOS 和 Linux 上都能跑，需要 ffmpeg 在 PATH 里、Python 3.11 以上。打包好的 Mac 应用在计划中，可以先去 GitHub 点个 Star。</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-try">
+            <summary>
+              <span class="faq-q">不安装能先看效果吗？</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>这个页面上所有片段都是预渲染的，可以先看再决定。刻意不做在线生成：那意味着要把你一小时的录像传到别人的服务器上。</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-time">
+            <summary>
+              <span class="faq-q">跑一次要多久？</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>47 分钟源片、5 个回合，在 M 系列 Mac 上大约 3 到 5 分钟，绝大部分时间花在那一次 x265 编码上。本机网页版会显示每个阶段的实时进度。</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-cost">
+            <summary>
+              <span class="faq-q">收费吗？</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>免费版不收钱：本机渲染、MCP server、全部自检都能用，每条合集最多 5 段、带一个小水印。Pro 是一次性 ¥138（$19）的许可证，解锁全部回合、去掉水印。支持微信、支付宝、银行卡、Apple Pay、Google Pay；许可证离线校验，不联网、不上报。</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-agent">
+            <summary>
+              <span class="faq-q">能让 ChatGPT / Claude / Cursor 帮我剪网球集锦吗？</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>能，通过 MCP。接入网球进化的 MCP server（Claude Code 一行命令，Claude Desktop、Cursor、Codex、Windsurf 贴一段 JSON），然后直接说「把 match.MOV 里最长的五个回合剪出来，角标写我们球馆的名字」。Agent 会依次调用 probe_video、rank_highlights、start_highlight_reel、get_job，并把自检结果告诉你。渲染仍然在你自己的电脑上。</p></div>
+          </details>
+
+          <details class="faq-item" id="faq-pro">
+            <summary>
+              <span class="faq-q">Pro 多了什么？是订阅吗？</span>
+              <span class="faq-icon" aria-hidden="true"></span>
+            </summary>
+            <div class="faq-a"><p>不是订阅。Pro 是一次性 ¥138 的离线许可证：所有回合（不止 5 段）、无水印、你的每台电脑都能用、0.x 版本内免费升级。用 tennis-evolution license activate KEY 激活，或让 Agent 调用 activate_license。</p></div>
+          </details>
+        </div>
+
+        <p class="faq-more">还有别的？<a href="https://github.com/bobobo2026/tennis-evolution/issues" rel="noopener">在 GitHub 上开个 issue ↗</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap">
+      <div class="foot-grid">
+        <div class="foot-brand">
+          <a class="brand" href="/zh/" aria-label="网球进化首页">
+            <span class="brand-ball" aria-hidden="true"></span>
+            <span>网球进化</span>
+          </a>
+          <p>从很长的录像里剪出网球回合，标上真正有用的数字，拿到一条通过自检的成片——一个字节都不用上传。</p>
+          <p class="foot-note">站内 demo 是用 CC0 素材跑出来的。这里不发布任何真实球馆素材，也不出现可辨认的真人。</p>
+        </div>
+        <nav class="foot-col" aria-label="站内">
+          <p class="foot-h">站内</p>
+          <a href="#demo">成片</a>
+          <a href="#how">工作原理</a>
+          <a href="#install">安装</a>
+          <a href="#faq">常见问题</a>
+          <a href="#agents">AI Agent（MCP）</a>
+          <a href="#pricing">价格</a>
+          <a href="/zh/guides/">指南</a>
+        </nav>
+        <nav class="foot-col" aria-label="项目">
+          <p class="foot-h">项目</p>
+          <a href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub ↗</a>
+          <a href="https://github.com/bobobo2026/tennis-evolution#readme" rel="noopener">README</a>
+          <a href="https://opensource.org/licenses/MIT" rel="noopener">MIT 许可</a>
+        </nav>
+        <nav class="foot-col" aria-label="语言">
+          <p class="foot-h">语言</p>
+          <a href="/" hreflang="en" lang="en">English</a>
+          <a href="/zh/" aria-current="page">中文</a>
+        </nav>
+      </div>
+      <div class="foot-bottom">
+        <span>© 2026 网球进化 (Tennis Evolution)</span>
+        <span class="mono">MIT 开源 · 用 ffmpeg + Pillow 构建 · 无遥测</span>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

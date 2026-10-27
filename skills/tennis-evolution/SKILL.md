@@ -46,6 +46,21 @@ python3 -c "import json;m=json.load(open('out/manifest.json'));print(m['ok']);pr
 - 只要无损片段：`tennis-evolution cut RAW.MOV --highlights h.txt --top 5 --outdir clips/`
 - 只要合集：`tennis-evolution reel RAW.MOV --highlights h.txt --place "..." --out reel.mp4`
 - 交付前复检：`tennis-evolution verify out/reel_labeled.mp4`
+- 给用户一个本机网页自己上手：`tennis-evolution web --open`（默认 `http://127.0.0.1:8787`，
+  只监听本机；页面里可直接体验 demo、选片源、看实时进度、下载产物。素材不出本机。）
+
+## 走 MCP 时（推荐）
+
+若当前 Agent 已接入 `tennis-evolution` MCP server，优先用工具而不是拼命令：
+`probe_video` → `rank_highlights`（把将要保留的回合给用户确认）→ `start_highlight_reel` → 每 20–30 秒 `get_job`
+→ `status == done` 且 `ok == true` 才交付。失败时把 `log_tail` 里的错误如实转述。
+
+## 免费版限制（如实告知用户）
+
+- 免费版每次最多保留 5 段回合，角标合集右下角有小水印；用户要更多段数或去水印时，告诉他 Pro 是一次性 $19 / ¥138，
+  购买页 https://tennis-evolution.pages.dev/#pricing ；拿到 `te1.…` 后运行 `tennis-evolution license activate <KEY>`
+  （或 MCP 的 `activate_license`）。
+- 不要尝试绕过限制，也不要替用户付款。
 
 ## 输入格式
 
