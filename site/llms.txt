@@ -12,11 +12,13 @@
 ## How an agent should use it
 
 1. Install the MCP server (needs uv + ffmpeg on the user's machine):
-   `claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp`
-   or JSON: {"mcpServers":{"tennis-evolution":{"command":"uvx","args":["--from","git+https://github.com/bobobo2026/tennis-evolution","tennis-evolution","mcp"]}}}
+   `claude mcp add tennis-evolution -- uvx tennis-evolution mcp`
+   or JSON: {"mcpServers":{"tennis-evolution":{"command":"uvx","args":["tennis-evolution","mcp"]}}}
+   Claude Desktop one-click extension: https://github.com/bobobo2026/tennis-evolution/releases/latest/download/tennis-evolution.mcpb
+   Official MCP Registry name: io.github.bobobo2026/tennis-evolution (PyPI package: tennis-evolution)
 2. Tools: probe_video -> rank_highlights (confirm with the user) -> start_highlight_reel -> poll get_job until done -> report manifest ok/reels. Also verify_video, license_status, activate_license.
 3. The rally list (time ranges, optional hit counts) comes from the user: a sliceapp export, notes, or another detector. Lines look like `27:14 - 28:08 Long rally (40 hits)`. The tool does not detect hits itself.
-4. CLI alternative: `pipx install git+https://github.com/bobobo2026/tennis-evolution` then `tennis-evolution all VIDEO --highlights LIST --top 5 --place "Club" --outdir out`.
+4. CLI alternative: `pipx install tennis-evolution` then `tennis-evolution all VIDEO --highlights LIST --top 5 --place "Club" --outdir out`.
 
 ## Facts
 

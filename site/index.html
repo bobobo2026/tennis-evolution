@@ -551,11 +551,11 @@
             <div class="terminal-head">
               <span>Terminal — <b>install + run</b></span>
               <button class="copy" type="button" data-label="Copy"
-                      data-copy="pipx install git+https://github.com/bobobo2026/tennis-evolution"
+                      data-copy="pipx install tennis-evolution"
                       aria-label="Copy the install command to the clipboard">Copy</button>
             </div>
             <pre><code><span class="c-dim"># ffmpeg first: brew install ffmpeg  ·  sudo apt install ffmpeg fonts-noto-cjk</span>
-<span class="c-cmd">pipx install git+https://github.com/bobobo2026/tennis-evolution</span>
+<span class="c-cmd">pipx install tennis-evolution</span>
 
 <span class="c-dim"># a highlight list from sliceapp, your detector, or by hand</span>
 <span class="c-cmd">tennis-evolution all IMG_5155.MOV --highlights highlights.txt --top 5 --place "Your Club" --timezone Asia/Shanghai --outdir out</span></code></pre>
@@ -594,17 +594,16 @@
               <button type="button" role="tab" aria-selected="false" data-tab="skill">Any agent</button>
             </div>
             <div class="terminal setup-pane" role="tabpanel" data-pane="code">
-              <div class="terminal-head"><span>Terminal</span><button class="copy" type="button" data-label="Copy" data-copy="claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp">Copy</button></div>
-              <pre><code><span class="c-cmd">claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp</span></code></pre>
+              <div class="terminal-head"><span>Terminal</span><button class="copy" type="button" data-label="Copy" data-copy="claude mcp add tennis-evolution -- uvx tennis-evolution mcp">Copy</button></div>
+              <pre><code><span class="c-cmd">claude mcp add tennis-evolution -- uvx tennis-evolution mcp</span></code></pre>
             </div>
             <div class="terminal setup-pane" role="tabpanel" data-pane="json" hidden>
-              <div class="terminal-head"><span>add to claude_desktop_config.json / .cursor/mcp.json</span><button class="copy" type="button" data-label="Copy" data-copy='{"mcpServers":{"tennis-evolution":{"command":"uvx","args":["--from","git+https://github.com/bobobo2026/tennis-evolution","tennis-evolution","mcp"]}}}'>Copy</button></div>
+              <div class="terminal-head"><span>add to claude_desktop_config.json / .cursor/mcp.json</span><button class="copy" type="button" data-label="Copy" data-copy='{"mcpServers":{"tennis-evolution":{"command":"uvx","args":["tennis-evolution","mcp"]}}}'>Copy</button></div>
               <pre><code>{
   "mcpServers": {
     "tennis-evolution": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/bobobo2026/tennis-evolution",
-               "tennis-evolution", "mcp"]
+      "args": ["tennis-evolution", "mcp"]
     }
   }
 }</code></pre>
@@ -620,6 +619,7 @@
               <pre><code><span class="c-dim"># copy the skill into any agent that loads SKILL.md files</span>
 <span class="c-cmd">git clone https://github.com/bobobo2026/tennis-evolution && cp -r tennis-evolution/skills/tennis-evolution ~/.claude/skills/</span></code></pre>
             </div>
+            <p class="setup-note">Claude Desktop: skip the JSON and install the one-click extension, <a href="https://github.com/bobobo2026/tennis-evolution/releases/latest/download/tennis-evolution.mcpb">tennis-evolution.mcpb</a>.</p>
             <p class="setup-note mono">tools: probe_video · rank_highlights · start_highlight_reel · get_job · verify_video · license_status · activate_license</p>
           </div>
         </div>

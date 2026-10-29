@@ -546,11 +546,11 @@
             <div class="terminal-head">
               <span>终端 — <b>安装 + 运行</b></span>
               <button class="copy" type="button" data-label="复制"
-                      data-copy="pipx install git+https://github.com/bobobo2026/tennis-evolution"
+                      data-copy="pipx install tennis-evolution"
                       aria-label="把安装命令复制到剪贴板">复制</button>
             </div>
             <pre><code><span class="c-dim"># 先装 ffmpeg：brew install ffmpeg  ·  sudo apt install ffmpeg fonts-noto-cjk</span>
-<span class="c-cmd">pipx install git+https://github.com/bobobo2026/tennis-evolution</span>
+<span class="c-cmd">pipx install tennis-evolution</span>
 
 <span class="c-dim"># 高光列表可以来自 sliceapp、你自己的检测器，或者手敲</span>
 <span class="c-cmd">tennis-evolution all IMG_5155.MOV --highlights highlights.txt --top 5 --place "你的球馆" --timezone Asia/Shanghai --outdir out</span></code></pre>
@@ -589,17 +589,16 @@
               <button type="button" role="tab" aria-selected="false" data-tab="skill">任意 Agent</button>
             </div>
             <div class="terminal setup-pane" role="tabpanel" data-pane="code">
-              <div class="terminal-head"><span>Terminal</span><button class="copy" type="button" data-label="复制" data-copy="claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp">复制</button></div>
-              <pre><code><span class="c-cmd">claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp</span></code></pre>
+              <div class="terminal-head"><span>Terminal</span><button class="copy" type="button" data-label="复制" data-copy="claude mcp add tennis-evolution -- uvx tennis-evolution mcp">复制</button></div>
+              <pre><code><span class="c-cmd">claude mcp add tennis-evolution -- uvx tennis-evolution mcp</span></code></pre>
             </div>
             <div class="terminal setup-pane" role="tabpanel" data-pane="json" hidden>
-              <div class="terminal-head"><span>写进 claude_desktop_config.json / .cursor/mcp.json</span><button class="copy" type="button" data-label="复制" data-copy='{"mcpServers":{"tennis-evolution":{"command":"uvx","args":["--from","git+https://github.com/bobobo2026/tennis-evolution","tennis-evolution","mcp"]}}}'>复制</button></div>
+              <div class="terminal-head"><span>写进 claude_desktop_config.json / .cursor/mcp.json</span><button class="copy" type="button" data-label="复制" data-copy='{"mcpServers":{"tennis-evolution":{"command":"uvx","args":["tennis-evolution","mcp"]}}}'>复制</button></div>
               <pre><code>{
   "mcpServers": {
     "tennis-evolution": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/bobobo2026/tennis-evolution",
-               "tennis-evolution", "mcp"]
+      "args": ["tennis-evolution", "mcp"]
     }
   }
 }</code></pre>
@@ -615,6 +614,7 @@
               <pre><code><span class="c-dim"># 把 skill 复制到任何会加载 SKILL.md 的 Agent</span>
 <span class="c-cmd">git clone https://github.com/bobobo2026/tennis-evolution && cp -r tennis-evolution/skills/tennis-evolution ~/.claude/skills/</span></code></pre>
             </div>
+            <p class="setup-note">Claude Desktop 也可以不写 JSON，直接装一键扩展：<a href="https://github.com/bobobo2026/tennis-evolution/releases/latest/download/tennis-evolution.mcpb">tennis-evolution.mcpb</a>。</p>
             <p class="setup-note mono">tools: probe_video · rank_highlights · start_highlight_reel · get_job · verify_video · license_status · activate_license</p>
           </div>
         </div>

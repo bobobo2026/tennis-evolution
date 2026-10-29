@@ -21,8 +21,6 @@
     "tennis-evolution": {
       "command": "uvx",
       "args": [
-        "--from",
-        "git+https://github.com/bobobo2026/tennis-evolution",
         "tennis-evolution",
         "mcp"
       ]

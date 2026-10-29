@@ -108,16 +108,16 @@
       <h1>让 AI Agent 帮你剪网球集锦</h1>
       <p class="lede">网球进化把整条流水线做成了 MCP server：AI Agent 可以读素材、挑回合、渲染带角标的合集、检查结果，而视频始终留在你的电脑上。</p>
         <h2>Claude Code</h2>
-        <pre><code>claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp</code></pre><p>或者装插件（含 Skill）：<code>/plugin marketplace add bobobo2026/tennis-evolution</code>，再 <code>/plugin install tennis-evolution@tennis-evolution</code>。</p>
+        <pre><code>claude mcp add tennis-evolution -- uvx tennis-evolution mcp</code></pre><p>或者装插件（含 Skill）：<code>/plugin marketplace add bobobo2026/tennis-evolution</code>，再 <code>/plugin install tennis-evolution@tennis-evolution</code>。</p>
         <h2>Claude Desktop / Cursor / Windsurf / Codex</h2>
         <pre><code>{
   "mcpServers": {
     "tennis-evolution": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/bobobo2026/tennis-evolution", "tennis-evolution", "mcp"]
+      "args": ["tennis-evolution", "mcp"]
     }
   }
-}</code></pre><p>运行 Agent 的电脑上需要装好 uv 和 ffmpeg。</p>
+}</code></pre><p>运行 Agent 的电脑上需要装好 uv 和 ffmpeg。Claude Desktop 也可以不写 JSON：下载一键扩展 <a href="https://github.com/bobobo2026/tennis-evolution/releases/latest/download/tennis-evolution.mcpb">tennis-evolution.mcpb</a>，双击打开即可。</p>
         <h2>怎么跟它说</h2>
         <ul><li>「把 ~/Movies/match.MOV 里最长的五个回合剪出来，角标写宁波 ECHO Tennis。」</li><li>「这是 sliceapp 导出的列表，按打球顺序做一条合集。」</li><li>「检查 out/reel_labeled.mp4 有没有音画不同步。」</li></ul>
         <h2>Agent 能用的工具</h2>

@@ -108,16 +108,16 @@
       <h1>Let your AI agent cut your tennis highlights</h1>
       <p class="lede">Tennis Evolution exposes its whole pipeline as an MCP server, so an AI agent can inspect your recording, pick the rallies, render a labeled reel and check the result — while the video stays on your machine.</p>
         <h2>Claude Code</h2>
-        <pre><code>claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp</code></pre><p>Or install the plugin, which adds the skill as well: <code>/plugin marketplace add bobobo2026/tennis-evolution</code> then <code>/plugin install tennis-evolution@tennis-evolution</code>.</p>
+        <pre><code>claude mcp add tennis-evolution -- uvx tennis-evolution mcp</code></pre><p>Or install the plugin, which adds the skill as well: <code>/plugin marketplace add bobobo2026/tennis-evolution</code> then <code>/plugin install tennis-evolution@tennis-evolution</code>.</p>
         <h2>Claude Desktop, Cursor, Windsurf, Codex</h2>
         <pre><code>{
   "mcpServers": {
     "tennis-evolution": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/bobobo2026/tennis-evolution", "tennis-evolution", "mcp"]
+      "args": ["tennis-evolution", "mcp"]
     }
   }
-}</code></pre><p>Requires <a href="https://docs.astral.sh/uv/">uv</a> and ffmpeg on the machine that runs the agent.</p>
+}</code></pre><p>Requires <a href="https://docs.astral.sh/uv/">uv</a> and ffmpeg on the machine that runs the agent. In Claude Desktop you can skip the JSON: download the one-click extension <a href="https://github.com/bobobo2026/tennis-evolution/releases/latest/download/tennis-evolution.mcpb">tennis-evolution.mcpb</a> and open it.</p>
         <h2>What to say</h2>
         <ul><li>“Cut the five longest rallies out of ~/Movies/match.MOV and label them Riverside Tennis Club.”</li><li>“Here is my sliceapp export — make a reel in the order they were played.”</li><li>“Check whether out/reel_labeled.mp4 has any audio sync problems.”</li></ul>
         <h2>The tools the agent gets</h2>

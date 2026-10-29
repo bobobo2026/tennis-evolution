@@ -78,7 +78,7 @@ sudo apt install ffmpeg fonts-noto-cjk
 
 ```bash
 # 直接安装（推荐，pipx 会隔离环境）
-pipx install git+https://github.com/bobobo2026/tennis-evolution
+pipx install tennis-evolution
 
 # 或者从源码开发
 git clone https://github.com/bobobo2026/tennis-evolution
@@ -86,7 +86,7 @@ cd tennis-evolution
 pip install -e ".[dev]"
 ```
 
-> 已发布到 PyPI：也可以直接 `pipx install tennis-evolution` 或 `uvx tennis-evolution`。
+> 不想装也可以 `uvx tennis-evolution …` 直接跑；要 main 分支最新代码用 `pipx install git+https://github.com/bobobo2026/tennis-evolution`。
 
 ## 输入：高光列表
 
@@ -180,7 +180,7 @@ Highlights — IMG_5155.m4a (made with sliceapp.so/tools/)
   "mcpServers": {
     "tennis-evolution": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/bobobo2026/tennis-evolution", "tennis-evolution", "mcp"]
+      "args": ["tennis-evolution", "mcp"]
     }
   }
 }
@@ -189,7 +189,7 @@ Highlights — IMG_5155.m4a (made with sliceapp.so/tools/)
 Claude Code 一行装好：
 
 ```bash
-claude mcp add tennis-evolution -- uvx --from git+https://github.com/bobobo2026/tennis-evolution tennis-evolution mcp
+claude mcp add tennis-evolution -- uvx tennis-evolution mcp
 ```
 
 暴露的工具：`probe_video` → `rank_highlights` → `start_highlight_reel`（后台任务）→ `get_job`（轮询，完成后返回

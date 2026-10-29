@@ -119,7 +119,7 @@
         <p>You need start and end times for each rally. Three ways work:</p><ul><li><b>sliceapp</b> (or any hit-detection app): export its highlight list as text, lines like <code>27:14 - 28:08 Long rally (40 hits)</code>.</li><li><b>Your own detector</b> or a spreadsheet: a JSON file <code>{"segments":[{"start":"27:14","end":"28:08","hits":40}]}</code>.</li><li><b>By hand</b>: scrub the video and type the times. Hit counts are optional.</li></ul>
         <h2>2. Install the tool (2 minutes)</h2>
         <pre><code>brew install ffmpeg
-pipx install git+https://github.com/bobobo2026/tennis-evolution</code></pre><p>Python 3.11+ and ffmpeg are the only requirements. macOS and Linux.</p>
+pipx install tennis-evolution</code></pre><p>Python 3.11+ and ffmpeg are the only requirements. macOS and Linux.</p>
         <h2>3. Render the reel</h2>
         <pre><code>tennis-evolution all IMG_5155.MOV --highlights highlights.txt \
   --top 5 --place "Riverside Tennis Club" --timezone America/New_York --outdir out</code></pre><p>You get <code>out/reel_labeled.mp4</code> (with labels), <code>out/reel_plain.mp4</code>, one lossless clip per rally in <code>out/clips/</code>, and <code>manifest.json</code> with every self-check result.</p>
