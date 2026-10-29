@@ -107,11 +107,14 @@ def github() -> dict[str, object]:
 
 
 def pypi() -> dict[str, object]:
-    status, body, _ = fetch(f"https://pypistats.org/api/packages/{PYPI}/recent")
+    status, body, _ = fetch(f"https://pypi.org/pypi/{PYPI}/json")
     if status != 200:
         return {"published": False}
-    recent = json.loads(body).get("data", {})
-    return {"published": True, **recent}
+    out: dict[str, object] = {"published": True, "version": json.loads(body)["info"]["version"]}
+    status, body, _ = fetch(f"https://pypistats.org/api/packages/{PYPI}/recent")
+    if status == 200:
+        out.update(json.loads(body).get("data", {}))
+    return out
 
 
 def mcp_registry() -> dict[str, object]:
