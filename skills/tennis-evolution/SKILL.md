@@ -1,6 +1,6 @@
 ---
 name: tennis-evolution
-description: 把长网球录像剪成带角标的精彩集锦。当用户给出网球/球类训练录像并说「剪出最长的几个回合」「做成精彩集锦」「加拍数/地点/时间角标」「把长视频里的有效回合挑出来」时必须使用。覆盖：高光列表解析与排序、关键帧无损切片、单次重编码拼接、HDR 竖屏处理、角标烧录、自检与 manifest。不负责击球检测算法本身（可由 sliceapp 等工具或人工提供列表）。
+description: Turn a long tennis recording into a highlight reel with hit count / venue / timestamp labels; use when the user wants the longest rallies cut from a tennis or racket-sport video. 把长网球录像剪成带角标的精彩集锦。当用户给出网球/球类训练录像并说「剪出最长的几个回合」「做成精彩集锦」「加拍数/地点/时间角标」「把长视频里的有效回合挑出来」时必须使用。覆盖：高光列表解析与排序、关键帧无损切片、单次重编码拼接、HDR 竖屏处理、角标烧录、自检与 manifest。不负责击球检测算法本身（可由 sliceapp 等工具或人工提供列表）。
 ---
 
 # tennis-evolution
