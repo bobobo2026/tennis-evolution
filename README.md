@@ -86,7 +86,7 @@ cd tennis-evolution
 pip install -e ".[dev]"
 ```
 
-> PyPI 发布后可直接 `pipx install tennis-evolution` / `uvx tennis-evolution`；在那之前用上面的 git 安装方式。
+> 已发布到 PyPI：也可以直接 `pipx install tennis-evolution` 或 `uvx tennis-evolution`。
 
 ## 输入：高光列表
 
@@ -170,6 +170,8 @@ Highlights — IMG_5155.m4a (made with sliceapp.so/tools/)
 <!-- mcp-name: io.github.bobobo2026/tennis-evolution -->
 
 对 Agent 说一句「把这段录像里最长的五个回合剪成带角标的合集」，剩下的它会自己跑完。
+
+**Claude Desktop 一键安装**：下载 [`tennis-evolution.mcpb`](https://github.com/bobobo2026/tennis-evolution/releases/latest/download/tennis-evolution.mcpb)，双击或拖进 Claude Desktop 的「设置 → 扩展」即可（需本机已装 ffmpeg；Pro 许可证和 ffmpeg 目录可在扩展设置里填）。包的源文件在 [`mcpb/`](mcpb/)。
 
 **MCP（Claude Desktop / Claude Code / Cursor / Codex / Windsurf 等任意 MCP 客户端）**：
 

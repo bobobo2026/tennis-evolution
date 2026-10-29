@@ -1,0 +1,101 @@
+{
+  "manifest_version": "0.4",
+  "name": "tennis-evolution",
+  "display_name": "Tennis Evolution",
+  "version": "0.2.0",
+  "description": "Turn a long tennis recording into a labeled highlight reel: lossless rally clips, hit-count labels, self-checks.",
+  "long_description": "Give Claude a long tennis recording and a rally list (time ranges, optionally hit counts, e.g. a sliceapp export or your own notes). Tennis Evolution cuts keyframe-aligned lossless clips, assembles a sync-correct reel in one encode, burns hit count / venue / wall clock / source timestamp onto the picture, and self-checks every output (decode errors, A/V offset and duration, black frames, silence).\n\nEverything runs on your machine; video never leaves it. Requires **ffmpeg** and **ffprobe** (macOS: `brew install ffmpeg`, Debian/Ubuntu: `apt install ffmpeg fonts-noto-cjk`).\n\nFree version keeps the 5 best rallies and adds a small watermark; a Pro licence removes both (https://tennis-evolution.pages.dev/#pricing).",
+  "author": {
+    "name": "Tennis Evolution",
+    "url": "https://tennis-evolution.pages.dev/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bobobo2026/tennis-evolution"
+  },
+  "homepage": "https://tennis-evolution.pages.dev/",
+  "documentation": "https://github.com/bobobo2026/tennis-evolution#readme",
+  "support": "https://github.com/bobobo2026/tennis-evolution/issues",
+  "icon": "icon.png",
+  "server": {
+    "type": "uv",
+    "entry_point": "server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "${__dirname}",
+        "server.py"
+      ],
+      "env": {
+        "TE_LICENSE_KEY": "${user_config.license_key}",
+        "TE_FFMPEG_DIR": "${user_config.ffmpeg_dir}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "probe_video",
+      "description": "Read duration, resolution, rotation, HDR/colour, audio tracks and recording time of a local video file. Run this first to confirm the file is readable."
+    },
+    {
+      "name": "rank_highlights",
+      "description": "Parse a rally list and show which rallies would be kept, so the user can confirm before rendering."
+    },
+    {
+      "name": "start_highlight_reel",
+      "description": "Start the full pipeline in the background: lossless keyframe-aligned clips, a plain reel, a labeled reel (hit count / venue / wall clock / source timestamp) and manifest.json with self-check results. Returns a job_id; poll get_job. A 47-minute iPhone HDR recording with 5 rallies takes 3-5 minutes on an M-series Mac."
+    },
+    {
+      "name": "get_job",
+      "description": "Status of a job from start_highlight_reel: running/done/failed, the last log lines, and once done the manifest (outputs and verification)."
+    },
+    {
+      "name": "verify_video",
+      "description": "Clean decode, zero start offset, A/V duration match, non-black first/last frame, non-silent audio."
+    },
+    {
+      "name": "license_status",
+      "description": "Whether a Pro licence is active, the free-tier limits and the pricing URL."
+    },
+    {
+      "name": "activate_license",
+      "description": "Verify a te1.… key offline and store it for future renders."
+    }
+  ],
+  "keywords": [
+    "tennis",
+    "highlight reel",
+    "video editing",
+    "ffmpeg",
+    "sports",
+    "rally",
+    "hdr"
+  ],
+  "license": "MIT",
+  "compatibility": {
+    "platforms": [
+      "darwin",
+      "linux"
+    ],
+    "runtimes": {
+      "python": ">=3.11"
+    }
+  },
+  "user_config": {
+    "license_key": {
+      "type": "string",
+      "title": "Pro licence key",
+      "description": "Optional te1.… key. Leave empty for the free version (5 rallies, small watermark).",
+      "sensitive": true,
+      "required": false
+    },
+    "ffmpeg_dir": {
+      "type": "directory",
+      "title": "ffmpeg folder",
+      "description": "Optional folder that contains ffmpeg and ffprobe. Leave empty to use PATH, /opt/homebrew/bin or /usr/local/bin.",
+      "required": false
+    }
+  }
+}

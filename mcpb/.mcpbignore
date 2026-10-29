@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+uv.lock
+*.mcpb
+README.md
+make_icon.py

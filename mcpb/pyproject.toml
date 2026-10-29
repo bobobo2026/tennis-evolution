@@ -1,0 +1,6 @@
+[project]
+name = "tennis-evolution-mcpb"
+version = "0.2.0"
+description = "MCPB bundle shim for the tennis-evolution MCP server"
+requires-python = ">=3.11"
+dependencies = ["tennis-evolution==0.2.0"]
