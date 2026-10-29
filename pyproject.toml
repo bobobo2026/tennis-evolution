@@ -33,6 +33,9 @@ Issues = "https://github.com/bobobo2026/tennis-evolution/issues"
 [tool.hatch.build.targets.wheel]
 packages = ["src/tennis_evolution"]
 
+[tool.hatch.build.targets.sdist]
+exclude = ["/site/**", "/functions", "/worker", "/wrangler.toml"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
