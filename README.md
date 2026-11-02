@@ -1,5 +1,13 @@
 # tennis-evolution · 网球录像 → 带角标的精彩集锦
 
+**Open-source, local alternative to SwingVision-style highlights.** Turn a 1-hour tennis recording into a reel of
+the longest rallies with the hit count, venue and time burned onto the picture — lossless clips, iPhone HDR kept,
+no upload, no account. Free (5 rallies per reel) or $19 once for Pro. Works from the CLI, a local web page, or any
+AI agent through its MCP server (`uvx tennis-evolution mcp`).
+How it compares: [tennis highlight apps compared](https://tennis-evolution.pages.dev/guides/best-tennis-highlight-apps/) ·
+[vs SwingVision](https://tennis-evolution.pages.dev/compare/swingvision/) ·
+[vs Tennis Cut](https://tennis-evolution.pages.dev/compare/tennis-cut/).
+
 把一两小时的网球录像，变成几条「只剩回合」的合集，并在画面上标好**拍数 / 地点 / 拍摄时间 / 片源时间点**。
 高光检测交给任意工具或人工（例如 [sliceapp](https://sliceapp.so/tools/) 的击球列表），剪辑、拼接、角标、校验全部在本地完成。
 
