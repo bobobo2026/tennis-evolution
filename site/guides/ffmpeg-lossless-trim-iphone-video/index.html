@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trim iPhone Videos Losslessly with ffmpeg (-c copy): Keyframes, Rotation and Audio Tracks</title>
+  <meta name="description" content="How to cut a long iPhone HEVC recording into clips without re-encoding: why -c copy cuts snap to keyframes, how to list keyframes with ffprobe, and how to avoid the spatial-audio and rotation traps.">
+  <link rel="canonical" href="https://tennis-evolution.pages.dev/guides/ffmpeg-lossless-trim-iphone-video/">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <meta name="theme-color" content="#0A0F0C">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Trim iPhone videos losslessly with ffmpeg">
+  <meta property="og:description" content="How to cut a long iPhone HEVC recording into clips without re-encoding: why -c copy cuts snap to keyframes, how to list keyframes with ffprobe, and how to avoid the spatial-audio and rotation traps.">
+  <meta property="og:url" content="https://tennis-evolution.pages.dev/guides/ffmpeg-lossless-trim-iphone-video/">
+  <meta property="og:image" content="https://tennis-evolution.pages.dev/assets/og.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "headline": "Trim iPhone videos losslessly with ffmpeg",
+      "description": "How to cut a long iPhone HEVC recording into clips without re-encoding: why -c copy cuts snap to keyframes, how to list keyframes with ffprobe, and how to avoid the spatial-audio and rotation traps.",
+      "inLanguage": "en",
+      "datePublished": "2026-11-02",
+      "dateModified": "2026-11-02",
+      "mainEntityOfPage": "https://tennis-evolution.pages.dev/guides/ffmpeg-lossless-trim-iphone-video/",
+      "author": {
+        "@type": "Organization",
+        "name": "Tennis Evolution",
+        "url": "https://tennis-evolution.pages.dev/"
+      },
+      "about": {
+        "@id": "https://tennis-evolution.pages.dev/#software"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can ffmpeg cut video at an exact frame without re-encoding?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. A stream copy has to start on a keyframe. For frame-exact cuts you must re-encode at least the start of the clip."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How far apart are keyframes in iPhone videos?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Typically 32 frames, about 1.07 s at 29.97 fps. List them with ffprobe -skip_frame nokey."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does a -c copy cut keep HDR and rotation?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Nothing is re-encoded, so HDR, Dolby Vision metadata and the rotation flag stay as recorded."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Tennis Evolution",
+          "item": "https://tennis-evolution.pages.dev/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Guides",
+          "item": "https://tennis-evolution.pages.dev/guides/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Trim iPhone videos losslessly with ffmpeg",
+          "item": "https://tennis-evolution.pages.dev/guides/ffmpeg-lossless-trim-iphone-video/"
+        }
+      ]
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+  <header class="site-head">
+    <div class="wrap head-inner">
+      <a class="brand" href="/"><span class="brand-ball" aria-hidden="true"></span><span>Tennis Evolution</span></a>
+      <nav class="nav" aria-label="Primary">
+        <a href="/#lab">Try it</a>
+        <a href="/#agents">Agents</a>
+        <a href="/#pricing">Pricing</a>
+        <a href="/guides/">Guides</a>
+      </nav>
+      <div class="head-actions">
+        <a class="head-btn" href="https://github.com/bobobo2026/tennis-evolution" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="guide">
+    <article class="wrap guide-body">
+      <p class="eyebrow"><a href="/guides/">Guides</a></p>
+      <h1>Trim iPhone videos losslessly with ffmpeg</h1>
+      <p class="lede"><b>Short answer:</b> list the keyframes, move each cut outwards to the nearest keyframe, then cut with <code>ffmpeg -ss START -i IN.MOV -t LENGTH -map 0:v:0 -map 0:a:0 -c copy -movflags +faststart out.mp4</code>. A stream-copy cut can only start on a keyframe; on iPhone HEVC those are about a second apart.</p>
+<h2>Why -c copy cuts are never frame-exact</h2>
+      <p>Stream copy keeps the original compressed frames, and most frames only make sense relative to an earlier keyframe. A copy can therefore only start on a keyframe. An iPhone at 29.97 fps typically puts one every 32 frames — about 1.07 s — so a lossless cut is accurate to roughly a second. That is fine for sports clips; pad each clip by a second at the start and a second and a half at the end.</p>
+      <h2>1. List the keyframes</h2>
+      <pre><code>ffprobe -v error -select_streams v:0 -skip_frame nokey \
+  -show_entries frame=pts_time -of csv=p=0 IMG_1234.MOV &gt; keyframes.txt</code></pre>
+      <h2>2. Snap each cut outwards</h2>
+      <p>For a rally from 27:14 to 28:08 (1634 s to 1688 s), take the last keyframe at or before 1633 s as the start and the first keyframe at or after 1689.5 s as the end. Snapping outwards means nothing of the rally is lost; snapping the end inwards would leave a clip that stops on a frame whose references are missing.</p>
+      <h2>3. Cut</h2>
+      <pre><code>ffmpeg -y -ss 1632.97 -i IMG_1234.MOV -t 57.66 \
+  -map 0:v:0 -map 0:a:0 -c copy -movflags +faststart rally-01.mp4</code></pre>
+      <ul>
+        <li><code>-ss</code> before <code>-i</code> seeks in the input, which is fast and lands on the keyframe.</li>
+        <li><code>-map 0:a:0</code> keeps the AAC track only. Mapping everything trips over the spatial-audio track recent iPhones add, which ffmpeg cannot decode.</li>
+        <li>Rotation is kept as metadata with stream copy, so the clip still plays upright; HDR is untouched because nothing is re-encoded.</li>
+        <li><code>-movflags +faststart</code> puts the index first, so the clip starts playing immediately when shared.</li>
+      </ul>
+      <h2>4. Do not join the clips with concat -c copy</h2>
+      <p>Each copied clip starts on a keyframe while its audio starts a few milliseconds off, and the concat demuxer adds those offsets up. On a real recording that gave a permanent 1.01 s audio offset. Build the reel with one encode instead: <a href="/guides/ffmpeg-concat-audio-desync/">why, and the command</a>, plus <a href="/guides/ffmpeg-iphone-hdr-hlg/">the flags that keep iPhone HDR</a>.</p>
+      <h2>For tennis, it is one command</h2>
+      <p><a href="/">Tennis Evolution</a> does steps 1–3 for every rally in a list, builds the labelled reel and verifies the results: <code>tennis-evolution all IMG_1234.MOV --highlights rallies.txt --top 5</code>. See the <a href="/guides/iphone-tennis-highlight-video/">iPhone tennis highlight guide</a>.</p>
+      <h2>FAQ</h2>
+      <div class="faq">
+          <details class="faq-item"><summary><span class="faq-q">Can ffmpeg cut video at an exact frame without re-encoding?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>No. A stream copy has to start on a keyframe. For frame-exact cuts you must re-encode at least the start of the clip.</p></div></details>
+          <details class="faq-item"><summary><span class="faq-q">How far apart are keyframes in iPhone videos?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>Typically 32 frames, about 1.07 s at 29.97 fps. List them with ffprobe -skip_frame nokey.</p></div></details>
+          <details class="faq-item"><summary><span class="faq-q">Does a -c copy cut keep HDR and rotation?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>Yes. Nothing is re-encoded, so HDR, Dolby Vision metadata and the rotation flag stay as recorded.</p></div></details>
+      </div>
+      <p class="cta-row"><a class="btn btn-primary" href="/#lab">Try the rally lab</a> <a class="btn btn-ghost" href="/#pricing">Free vs Pro</a></p>
+    </article>
+  </main>
+  <footer class="foot"><div class="wrap foot-bottom"><span>© 2026 Tennis Evolution</span><span class="mono">runs locally · no upload</span></div></footer>
+</body>
+</html>

@@ -21,13 +21,13 @@
   </url>
   <url>
     <loc>https://tennis-evolution.pages.dev/guides/</loc>
-    <lastmod>2026-10-27</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://tennis-evolution.pages.dev/zh/guides/</loc>
-    <lastmod>2026-10-27</lastmod>
+    <lastmod>2026-11-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -66,5 +66,45 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://tennis-evolution.pages.dev/guides/ai-agent-tennis-highlights/"/>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tennis-evolution.pages.dev/zh/guides/ai-agent-jian-wangqiu/"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://tennis-evolution.pages.dev/guides/ai-agent-tennis-highlights/"/>
+  </url>
+  <url>
+    <loc>https://tennis-evolution.pages.dev/guides/best-tennis-highlight-apps/</loc>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tennis-evolution.pages.dev/guides/best-tennis-highlight-apps/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tennis-evolution.pages.dev/zh/guides/wangqiu-jijin-app-duibi/"/>
+  </url>
+  <url>
+    <loc>https://tennis-evolution.pages.dev/compare/swingvision/</loc>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tennis-evolution.pages.dev/compare/tennis-cut/</loc>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tennis-evolution.pages.dev/guides/ffmpeg-iphone-hdr-hlg/</loc>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tennis-evolution.pages.dev/guides/ffmpeg-lossless-trim-iphone-video/</loc>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tennis-evolution.pages.dev/zh/guides/wangqiu-jijin-app-duibi/</loc>
+    <lastmod>2026-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://tennis-evolution.pages.dev/guides/best-tennis-highlight-apps/"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://tennis-evolution.pages.dev/zh/guides/wangqiu-jijin-app-duibi/"/>
   </url>
 </urlset>

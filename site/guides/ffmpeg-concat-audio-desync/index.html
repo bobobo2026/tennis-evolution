@@ -110,6 +110,7 @@
  -c:v libx265 -crf 19 -color_primaries bt2020 -color_trc arib-std-b67 -colorspace bt2020nc reel.mp4</code></pre><p>Every segment is trimmed from the original source with sample-accurate timestamps reset to zero, concatenated in the filter graph, and encoded once. No join ever sees a keyframe boundary, so there is nothing to drift.</p>
         <h2>Then verify, every time</h2>
         <p>Tennis Evolution checks each output: clean full decode, video and audio both starting at 0 s, matching durations, non-black first and last frames, non-silent audio. A failing check exits non-zero, so a script or an agent cannot mistake a broken reel for a finished one.</p>
+      <p>Related: <a href="/guides/ffmpeg-lossless-trim-iphone-video/">trim iPhone videos losslessly</a> · <a href="/guides/ffmpeg-iphone-hdr-hlg/">keep iPhone HDR when re-encoding</a></p>
       <h2>FAQ</h2>
       <div class="faq">
           <details class="faq-item"><summary><span class="faq-q">Can I still do a lossless join?</span><span class="faq-icon" aria-hidden="true"></span></summary><div class="faq-a"><p>Yes, `tennis-evolution concat` exists as an escape hatch, but it reports the timestamp problems instead of hiding them.</p></div></details>

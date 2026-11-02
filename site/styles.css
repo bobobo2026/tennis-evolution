@@ -2701,6 +2701,44 @@ body.lang-zh .facts dd .unit {
   color: inherit;
 }
 
+.guide-body .table-wrap {
+  margin: 20px 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+}
+
+.guide-body table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.guide-body th,
+.guide-body td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  text-align: left;
+  vertical-align: top;
+}
+
+.guide-body th {
+  background: var(--ink-2);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.guide-body tr:last-child td {
+  border-bottom: 0;
+}
+
+.guide-body .fine {
+  font-size: 13px;
+}
+
 .guide-list {
   display: grid;
   gap: 12px;

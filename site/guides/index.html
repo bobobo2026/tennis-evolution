@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Guides · Tennis Evolution — tennis highlight videos, HDR, AI agents</title>
-  <meta name="description" content="Practical guides: tennis highlight videos from phone recordings, keeping HDR, using AI agents, and ffmpeg pitfalls.">
+  <meta name="description" content="Practical guides: tennis highlight apps compared, highlight videos from phone recordings, keeping iPhone HDR in ffmpeg, AI agents, and ffmpeg pitfalls.">
   <link rel="canonical" href="https://tennis-evolution.pages.dev/guides/">
   <meta name="theme-color" content="#0A0F0C">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -20,9 +20,14 @@
     <div class="wrap guide-body">
       <h1>Guides</h1>
       <ul class="guide-list">
+        <li><a href="/guides/best-tennis-highlight-apps/"><b>Best apps to cut a tennis match video into rallies (2026)</b><span>SwingVision, Tennis Cut, PerfectSwing, Kinovea and Tennis Evolution compared: automatic or not, on-device or cloud, platforms, labels and price.</span></a></li>
+        <li><a href="/compare/swingvision/"><b>Tennis Evolution vs SwingVision</b><span>A subscription stats app versus a free, local tool for labelled highlight reels. What each does better.</span></a></li>
+        <li><a href="/compare/tennis-cut/"><b>Tennis Evolution vs Tennis Cut</b><span>Automatic rally trimming on the iPhone versus a labelled, verified reel built on your computer.</span></a></li>
         <li><a href="/guides/iphone-tennis-highlight-video/"><b>Make a tennis highlight video from a long iPhone recording</b><span>Step-by-step: turn a 1-hour iPhone tennis recording into a highlight reel of the longest rallies, with hit count, venue and time labels, without losing HDR. Free, local, no upload.</span></a></li>
         <li><a href="/guides/ai-agent-tennis-highlights/"><b>Let your AI agent cut your tennis highlights</b><span>Connect the Tennis Evolution MCP server to Claude Code, Claude Desktop, Cursor or Codex and ask it to cut the longest rallies from a tennis video. One-line setup, renders locally.</span></a></li>
         <li><a href="/guides/ffmpeg-concat-audio-desync/"><b>Why naive ffmpeg concat desyncs a highlight reel</b><span>Joining stream-copied clips with the concat demuxer produced a permanent 1.01 s audio offset, Non-monotonic DTS and broken HEVC references. Here is why, and the trim+concat one-pass fix.</span></a></li>
+        <li><a href="/guides/ffmpeg-iphone-hdr-hlg/"><b>Keep iPhone HDR when cutting and joining videos with ffmpeg</b><span>Why iPhone HLG clips turn grey after ffmpeg, and the flags that keep 10-bit HDR: colour tags, pix_fmt, hvc1, rotation, Dolby Vision.</span></a></li>
+        <li><a href="/guides/ffmpeg-lossless-trim-iphone-video/"><b>Trim iPhone videos losslessly with ffmpeg</b><span>Why -c copy cuts snap to keyframes, how to list them with ffprobe, and the spatial-audio and rotation traps.</span></a></li>
       </ul>
     </div>
   </main>
