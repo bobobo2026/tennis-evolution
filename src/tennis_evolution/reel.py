@@ -87,8 +87,35 @@ def _encoder_args(codec: str, crf: float, preset: str, pix_fmt: str) -> list[str
     ]
 
 
+def planned_size(info: MediaInfo, max_height: int | None) -> tuple[int, int]:
+    """Display size of the reel after rotation and an optional height cap.
+
+    Labels must be rendered for the *output* size, not the source size, otherwise
+    a 4K action-cam clip would get labels laid out for 2688 px and then downscaled.
+    """
+    width, height = info.display_width, info.display_height
+    if max_height and height > max_height:
+        factor = max_height / height
+        width = max(2, int(round(width * factor / 2)) * 2)
+        height = max_height
+    return width, height
+
+
+def scale_chain(fps: float | None, max_height: int | None) -> str:
+    """Filter suffix that caps frame rate and height before overlaying labels."""
+    parts: list[str] = []
+    if fps:
+        parts.append(f"fps={fps:g}")
+    if max_height:
+        parts.append(f"scale=-2:{max_height}:flags=lanczos")
+    return ("," + ",".join(parts)) if parts else ""
+
+
 def _build_filter(
-    plans: list[ClipPlan], overlays: list[Path | None], pix_fmt: str
+    plans: list[ClipPlan],
+    overlays: list[Path | None],
+    pix_fmt: str,
+    scale_suffix: str = "",
 ) -> tuple[str, str, str]:
     """Return (filter_complex, video_label, audio_label)."""
     count = len(plans)
@@ -104,7 +131,7 @@ def _build_filter(
     chains: list[str] = []
     concat_inputs: list[str] = []
     for i in range(count):
-        chains.append(f"[{i}:v]setpts=PTS-STARTPTS[s{i}]")
+        chains.append(f"[{i}:v]setpts=PTS-STARTPTS{scale_suffix}[s{i}]")
         overlay_index = overlay_input_index[i]
         if overlay_index is not None:
             chains.append(f"[s{i}][{overlay_index}:v]overlay=0:0:shortest=0,format={pix_fmt}[v{i}]")
@@ -153,6 +180,8 @@ def render_reel(
     codec: str = "hevc",
     audio: StreamInfo | None = None,
     keep_rotation: bool = False,
+    max_height: int | None = None,
+    fps: float | None = None,
     dry_run: bool = False,
     progress: Callable[[float], None] | None = None,
     cancelled: Callable[[], bool] | None = None,
@@ -187,12 +216,16 @@ def render_reel(
         if overlay is not None:
             cmd += ["-i", str(overlay)]
 
-    filter_complex, v_label, a_label = _build_filter(plans, overlay_list, pix_fmt)
+    filter_complex, v_label, a_label = _build_filter(
+        plans, overlay_list, pix_fmt, scale_chain(fps, max_height)
+    )
     cmd += ["-filter_complex", filter_complex, "-map", v_label]
     if audio_stream is not None:
         cmd += ["-map", a_label]
     cmd += _encoder_args(codec, crf, preset, pix_fmt)
     cmd += _colour_args(info)
+    if max_height or fps:
+        note(f"output capped at {max_height or 'source'}p / {fps or 'source'} fps")
     if info.hdr and not keep_rotation:
         note(f"source is HDR ({info.color_transfer}); writing HDR-tagged {codec} output")
     if keep_rotation:

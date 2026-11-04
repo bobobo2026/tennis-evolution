@@ -26,7 +26,7 @@ from .license import (
     license_path,
 )
 from .media import MediaInfo, StreamInfo, ensure_tools, keyframes, probe
-from .reel import concat_lossless, render_reel
+from .reel import concat_lossless, planned_size, render_reel
 from .util import format_duration, format_timecode, note, warn
 from .verify import CheckResult, all_ok, verify_file
 
@@ -77,6 +77,18 @@ def _add_source_args(parser: argparse.ArgumentParser) -> None:
         "--keep-rotation",
         action="store_true",
         help="keep rotation metadata instead of baking portrait orientation",
+    )
+    parser.add_argument(
+        "--max-height",
+        type=int,
+        default=None,
+        help="downscale the reel to this height (e.g. 1080); labels are laid out for the output size",
+    )
+    parser.add_argument(
+        "--fps",
+        type=float,
+        default=None,
+        help="cap the reel frame rate (e.g. 30); useful for 4K/60 action-cam sources",
     )
     parser.add_argument(
         "--no-verify", action="store_true", help="skip the self checks (not recommended)"
@@ -319,7 +331,7 @@ def _render(
         fonts = discover_fonts(args.font, args.font_bold)
         style = LabelStyle(watermark=None if current() else WATERMARK_TEXT)
         overlays = write_overlays(
-            (info.display_width, info.display_height),
+            planned_size(info, args.max_height),
             specs,
             Path(args.outdir) / "labels",
             fonts,
@@ -337,6 +349,8 @@ def _render(
         codec=args.codec,
         audio=audio,
         keep_rotation=args.keep_rotation,
+        max_height=args.max_height,
+        fps=args.fps,
         dry_run=args.dry_run,
     )
 
