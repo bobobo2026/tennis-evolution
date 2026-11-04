@@ -9,6 +9,7 @@ from tennis_evolution.highlights import Segment
 from tennis_evolution.labels import (
     FontPair,
     LabelSpec,
+    LabelStyle,
     discover_fonts,
     format_wall_clock,
     render_label,
@@ -94,3 +95,29 @@ def test_write_overlays_creates_one_png_per_spec(tmp_path) -> None:
     paths = write_overlays((1080, 1920), specs, tmp_path, fonts)
     assert [path.name for path in paths] == ["label_01.png", "label_02.png"]
     assert all(path.exists() for path in paths)
+
+
+def test_landscape_labels_use_short_side_scale() -> None:
+    """1920x1080 must not get labels scaled for a 1920-wide portrait canvas."""
+    fonts = _fonts()
+    spec = LabelSpec(place="宁波老体", clock="2026-11-03 14:10", source_ts="8:10", hits=62)
+    portrait = render_label((1080, 1920), spec, fonts)
+    landscape = render_label((1920, 1080), spec, fonts)
+    portrait_box = portrait.getchannel("A").getbbox()
+    landscape_box = landscape.getchannel("A").getbbox()
+    assert portrait_box and landscape_box
+    portrait_h = portrait_box[3] - portrait_box[1]
+    landscape_h = landscape_box[3] - landscape_box[1]
+    # same design scale on both (min side = 1080), so painted heights are within 10%
+    assert abs(landscape_h - portrait_h) / portrait_h < 0.1
+
+
+def test_scale_multiplier_shrinks_labels() -> None:
+    fonts = _fonts()
+    spec = LabelSpec(place="宁波老体", hits=62)
+    full = render_label((1920, 1080), spec, fonts)
+    small = render_label((1920, 1080), spec, fonts, LabelStyle(scale_multiplier=0.8))
+    full_box = full.getchannel("A").getbbox()
+    small_box = small.getchannel("A").getbbox()
+    assert full_box and small_box
+    assert (small_box[3] - small_box[1]) < (full_box[3] - full_box[1])

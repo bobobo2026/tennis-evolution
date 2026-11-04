@@ -22,6 +22,8 @@ dependencies = ["Pillow>=10.0"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.5"]
+#: built-in audio rally detection (tennis-evolution detect / reel --detect)
+detect = ["librosa>=0.10"]
 
 [project.scripts]
 tennis-evolution = "tennis_evolution.cli:main"

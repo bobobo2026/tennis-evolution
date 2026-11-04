@@ -232,7 +232,7 @@ def render_reel(
         cmd += ["-noautorotate"]
     if audio_stream is not None:
         cmd += ["-c:a", "aac", "-b:a", "192k", "-ar", "48000"]
-    cmd += ["-movflags", "+faststart", str(target)]
+    cmd += ["-dn", "-sn", "-write_tmcd", "0", "-movflags", "+faststart", str(target)]
 
     if dry_run:
         note("dry run: " + " ".join(cmd[:12]) + " ...")

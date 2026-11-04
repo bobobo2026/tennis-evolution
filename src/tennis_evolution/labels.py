@@ -122,6 +122,8 @@ class LabelStyle:
     text_dim: tuple[int, int, int] = (232, 232, 232)
     text_faint: tuple[int, int, int] = (190, 190, 190)
     extra_lines: list[str] = field(default_factory=list)
+    #: multiply the automatic scale (1.0 = default); use <1 for smaller corner labels
+    scale_multiplier: float = 1.0
     watermark: str | None = None
     watermark_px: int = 22
 
@@ -201,7 +203,9 @@ def render_label(
 
     style = style or LabelStyle()
     width, height = size
-    scale = width / style.design_width
+    # Base the scale on the *short* side so a 1920x1080 landscape frame does not get
+    # labels sized for a 1920 px wide portrait canvas (they looked oversized on DJI footage).
+    scale = (min(width, height) / style.design_width) * style.scale_multiplier
     canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(canvas)
 

@@ -38,7 +38,12 @@ SORT_CHOICES = ("hits", "duration", "start")
 def _add_source_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("video", help="source recording (MOV/MP4/MKV)")
     parser.add_argument(
-        "--highlights", required=True, help="highlight list (.txt from sliceapp or .json)"
+        "--highlights", default=None, help="highlight list (.txt from sliceapp or .json)"
+    )
+    parser.add_argument(
+        "--detect",
+        action="store_true",
+        help="detect rallies from audio with librosa instead of reading a highlight list",
     )
     parser.add_argument(
         "--top", type=int, default=5, help="keep the N best rallies (default: 5, 0 = all)"
@@ -106,6 +111,12 @@ def _add_label_args(parser: argparse.ArgumentParser) -> None:
         "--timezone",
         default=None,
         help="timezone for the wall clock, e.g. Asia/Shanghai (default: system local)",
+    )
+    parser.add_argument(
+        "--label-scale",
+        type=float,
+        default=1.0,
+        help="multiply the corner-label size (default 1.0; try 0.8 for smaller badges)",
     )
     parser.add_argument(
         "--font", default=None, help="font file for secondary text, optionally /path/font.ttc:index"
@@ -257,7 +268,19 @@ def _prepare(
     args: argparse.Namespace,
 ) -> tuple[MediaInfo, list[Segment], list[ClipPlan]]:
     info = probe(args.video)
-    segments = load_highlights(args.highlights)
+    if getattr(args, "detect", False):
+        from .detect import Params, detect_rallies
+
+        note("detecting rallies from audio (librosa) ...")
+        segments = detect_rallies(
+            str(info.path), Params(min_hits=getattr(args, "min_hits", 6)), top=None
+        )
+        if not segments:
+            raise SystemExit("no rallies detected; lower --min-hits or pass --highlights")
+    elif args.highlights:
+        segments = load_highlights(args.highlights)
+    else:
+        raise SystemExit("pass --highlights LIST or --detect")
     args.top = free_tier_top(args.top, pro=current() is not None)
     chosen = select_top(segments, args.top, args.sort)
     if not chosen:
@@ -329,7 +352,10 @@ def _render(
             source_label=args.source_label,
         )
         fonts = discover_fonts(args.font, args.font_bold)
-        style = LabelStyle(watermark=None if current() else WATERMARK_TEXT)
+        style = LabelStyle(
+            watermark=None if current() else WATERMARK_TEXT,
+            scale_multiplier=args.label_scale,
+        )
         overlays = write_overlays(
             planned_size(info, args.max_height),
             specs,
@@ -451,6 +477,32 @@ def _cmd_all(args: argparse.Namespace) -> int:
         print(f"  {key:<8} {value}")
     print(f"  verify   {'PASS' if ok else 'FAIL'}  (details in {manifest_path})")
     return 0 if ok else 1
+
+
+def _cmd_detect(args: argparse.Namespace) -> int:
+    from .detect import Params, detect_rallies
+
+    info = probe(args.video)
+    note(f"detecting rallies in {info.path.name} (librosa, audio only) ...")
+    segments = detect_rallies(
+        str(info.path),
+        Params(min_hits=args.min_hits, max_gap=args.max_gap, max_duration=args.max_duration),
+        top=None,
+    )
+    if not segments:
+        print("no rallies detected")
+        return 1
+    chosen = segments[: args.top] if args.top and args.top > 0 else segments
+    print(f"{len(segments)} rallies detected, showing {len(chosen)}:")
+    for index, segment in enumerate(chosen, 1):
+        print(
+            f"  {index:02d}. {format_timecode(segment.start)}-{format_timecode(segment.end)}"
+            f"  {segment.hits} hits  {format_duration(segment.duration)}"
+        )
+    if args.out:
+        save_highlights(chosen, args.out)
+        note(f"wrote {args.out}")
+    return 0
 
 
 def _cmd_concat(args: argparse.Namespace) -> int:
@@ -582,6 +634,15 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--no-overwrite", action="store_true")
     p.set_defaults(func=_cmd_all)
+
+    p = sub.add_parser("detect", help="find rallies from audio (librosa) and print/save a list")
+    p.add_argument("video")
+    p.add_argument("--top", type=int, default=5, help="keep the N longest rallies (0 = all)")
+    p.add_argument("--min-hits", type=int, default=6)
+    p.add_argument("--max-gap", type=float, default=3.0)
+    p.add_argument("--max-duration", type=float, default=100.0)
+    p.add_argument("--out", help="write the result as JSON for cut/reel/all")
+    p.set_defaults(func=_cmd_detect)
 
     p = sub.add_parser("concat", help="lossless concat escape hatch (reports timestamp problems)")
     p.add_argument("clips", nargs="+")

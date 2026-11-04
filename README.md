@@ -85,6 +85,9 @@ sudo apt install ffmpeg fonts-noto-cjk
 然后装本工具（Python ≥ 3.11）：
 
 ```bash
+# 需要内置音频检测时加 [detect]（会装 librosa）
+# pipx install "tennis-evolution[detect]@git+https://github.com/bobobo2026/tennis-evolution"
+
 # 直接安装（推荐，pipx 会隔离环境）
 pipx install tennis-evolution
 
@@ -132,6 +135,7 @@ Highlights — IMG_5155.m4a (made with sliceapp.so/tools/)
 | `cut VIDEO --highlights LIST --outdir clips/` | 只切无损片段，不合成 |
 | `reel VIDEO --highlights LIST --place "..." --out reel.mp4` | 只出合集（可加角标） |
 | `all VIDEO --highlights LIST --outdir out/` | 全流程 + 自检 + manifest |
+| `detect VIDEO --top 5 --out h.json` | 只用音频找回合（librosa），产出可直接喂给 `cut`/`reel` |
 | `verify FILE` | 单独跑一次自检 |
 | `concat CLIP... --out FILE` | 无损拼接备选路径（会主动报告时间戳问题，见下） |
 | `license [activate KEY\|deactivate]` | 查看 / 激活 / 移除 Pro 许可证 |
