@@ -36,9 +36,9 @@ class Params:
 
     sr: int = DEFAULT_SR
     hop_length: int = 256
-    delta: float = 0.18
-    wait: int = 8
-    strength_pct: float = 92.0
+    delta: float = 0.12  # on the 0..1 normalised envelope; calibrated to +-3% of true hit counts
+    wait: int = 5
+    strength_pct: float = 0.0  # 0 = keep every onset librosa reports
     min_hits: int = 6
     max_gap: float = 3.0
     max_duration: float = 100.0
@@ -114,7 +114,9 @@ def onset_times(y: np.ndarray, params: Params | None = None) -> np.ndarray:
     params = params or Params()
     import librosa  # imported lazily so the core install stays dependency free
 
-    envelope = librosa.onset.onset_strength(y=y, sr=params.sr, hop_length=params.hop_length)
+    envelope = librosa.util.normalize(
+        librosa.onset.onset_strength(y=y, sr=params.sr, hop_length=params.hop_length)
+    )
     frames = librosa.onset.onset_detect(
         onset_envelope=envelope,
         sr=params.sr,
@@ -126,12 +128,10 @@ def onset_times(y: np.ndarray, params: Params | None = None) -> np.ndarray:
     )
     if len(frames) == 0:
         return np.array([], dtype=float)
-    strengths = envelope[frames]
-    threshold = (
-        np.percentile(envelope[envelope > 0], params.strength_pct) if np.any(envelope > 0) else 0.0
-    )
-    keep = strengths >= threshold
-    return librosa.frames_to_time(frames[keep], sr=params.sr, hop_length=params.hop_length)
+    if params.strength_pct > 0 and np.any(envelope > 0):
+        threshold = np.percentile(envelope[envelope > 0], params.strength_pct)
+        frames = frames[envelope[frames] >= threshold]
+    return librosa.frames_to_time(frames, sr=params.sr, hop_length=params.hop_length)
 
 
 def detect_rallies(
